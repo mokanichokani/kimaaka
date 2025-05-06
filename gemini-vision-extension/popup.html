@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gemini Vision</title>
+    <!-- All CSS from the <style> block has been removed -->
+</head>
+<body>
+    <!--
+        The div#main-content is kept for potential JS hooks.
+        A table is used inside it to achieve horizontal layout without CSS.
+    -->
+    <div id="main-content">
+        <table>
+            <tr>
+                <td><button id="captureAndAnalyze">A</button></td>
+                <td>
+                    <!--
+                        output-container is kept for potential JS hooks.
+                        It will contain either the loading indicator or the result textarea.
+                    -->
+                    <div id="output-container">
+                        <!--
+                            The 'loading' div is kept, its text content is "Loading...".
+                            It's hidden by default using the HTML 'hidden' attribute.
+                            popup.js should toggle this attribute (e.g., loading.hidden = false/true).
+                        -->
+                        <div id="loading" hidden>L...</div>
+                        <!--
+                            The 'result' element is now a textarea to allow 'cols' attribute for width.
+                            'cols="5"' makes it small (approx 5 characters wide).
+                            It's hidden by default. popup.js should toggle this attribute and set its value.
+                            It's readonly as it's for display.
+                        -->
+                        <div id="result"  ></div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!--
+        The api-key-prompt div is kept.
+        It's hidden by default using the HTML 'hidden' attribute.
+        popup.js should toggle this attribute based on API key presence.
+        The class="api-key-missing" was removed as its styles are gone.
+    -->
+    <div id="api-key-prompt" hidden>
+        <p>Set Gemini API Key in <a href="#" id="openOptions">options</a>.</p>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
