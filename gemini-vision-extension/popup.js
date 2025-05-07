@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const openOptionsLink = document.getElementById('openOptions');
 
     let apiKey = null;
-    const GEMINI_MODEL_NAME = "gemini-2.5-pro-exp-03-25"; // Or "gemini-1.0-pro-vision-001"
+    const GEMINI_MODEL_NAME = "gemini-2.5-flash-preview-04-17"; // Or "gemini-1.0-pro-vision-001"
                                                        // Or "gemini-2.5-pro-exp-03-25" if you have access
 
     async function performCaptureAndAnalysis() {

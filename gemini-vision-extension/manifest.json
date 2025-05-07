@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Gemini Vision Helper",
+  "name": "Ad blocker lol",
   "version": "0.2.0",
   "description": "Captures the current window and sends it to Gemini for analysis.",
   "permissions": [
