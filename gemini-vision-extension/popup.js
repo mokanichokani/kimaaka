@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const captureButton = document.getElementById('captureAndAnalyze');
+    // const captureButton = document.getElementById('captureAndAnalyze'); // Button is removed
     const resultDiv = document.getElementById('result');
     const loadingDiv = document.getElementById('loading');
     const apiKeyPromptDiv = document.getElementById('api-key-prompt');
@@ -7,18 +7,59 @@ document.addEventListener('DOMContentLoaded', () => {
     const openOptionsLink = document.getElementById('openOptions');
 
     let apiKey = null;
-    const GEMINI_MODEL_NAME = "gemini-2.5-flash-preview-04-17"; // Or "gemini-1.0-pro-vision-001"
+    const GEMINI_MODEL_NAME = "gemini-2.5-pro-exp-03-25"; // Or "gemini-1.0-pro-vision-001"
                                                        // Or "gemini-2.5-pro-exp-03-25" if you have access
+
+    async function performCaptureAndAnalysis() {
+        if (!apiKey) {
+            // This case should ideally be handled by the initial API key check,
+            // but as a safeguard:
+            resultDiv.textContent = 'API Key not set. Please set it in the options.';
+            // resultDiv.className = 'error'; // If you have CSS for errors
+            mainContentDiv.hidden = true;
+            apiKeyPromptDiv.hidden = false;
+            return;
+        }
+
+        loadingDiv.hidden = false;
+        resultDiv.textContent = '';
+        // resultDiv.className = ''; // Reset any error class
+
+        try {
+            // Send message to background script to capture the tab
+            const response = await chrome.runtime.sendMessage({ action: "captureVisibleTab" });
+
+            if (response.error) {
+                throw new Error(`Capture error: ${response.error}`);
+            }
+            if (!response.imageDataUrl) {
+                throw new Error("Failed to get image data URL.");
+            }
+
+            const base64ImageData = response.imageDataUrl.split(',')[1]; // Remove "data:image/png;base64,"
+
+            const analysis = await callGeminiApi(base64ImageData, apiKey);
+            resultDiv.textContent = analysis;
+
+        } catch (error) {
+            console.error('Error:', error);
+            resultDiv.textContent = `Error: ${error.message}`;
+            // resultDiv.className = 'error'; // If you have CSS for errors
+        } finally {
+            loadingDiv.hidden = true;
+        }
+    }
 
     // Check for API Key first
     chrome.storage.sync.get(['geminiApiKey'], (result) => {
         if (result.geminiApiKey) {
             apiKey = result.geminiApiKey;
-            mainContentDiv.style.display = 'block';
-            apiKeyPromptDiv.style.display = 'none';
+            mainContentDiv.hidden = false; // Show main content
+            apiKeyPromptDiv.hidden = true;   // Hide API key prompt
+            performCaptureAndAnalysis();      // <<--- ACTION TRIGGERED HERE
         } else {
-            mainContentDiv.style.display = 'none';
-            apiKeyPromptDiv.style.display = 'block';
+            mainContentDiv.hidden = true;    // Hide main content
+            apiKeyPromptDiv.hidden = false;  // Show API key prompt
         }
     });
 
@@ -31,49 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-
-    if (captureButton) {
-        captureButton.addEventListener('click', async () => {
-            if (!apiKey) {
-                resultDiv.textContent = 'API Key not set. Please set it in the options.';
-                resultDiv.className = 'error';
-                // Optionally, direct them to options again
-                mainContentDiv.style.display = 'none';
-                apiKeyPromptDiv.style.display = 'block';
-                return;
-            }
-
-            loadingDiv.style.display = 'block';
-            resultDiv.textContent = '';
-            resultDiv.className = '';
-            captureButton.disabled = true;
-
-            try {
-                // Send message to background script to capture the tab
-                const response = await chrome.runtime.sendMessage({ action: "captureVisibleTab" });
-
-                if (response.error) {
-                    throw new Error(`Capture error: ${response.error}`);
-                }
-                if (!response.imageDataUrl) {
-                    throw new Error("Failed to get image data URL.");
-                }
-
-                const base64ImageData = response.imageDataUrl.split(',')[1]; // Remove "data:image/png;base64,"
-
-                const analysis = await callGeminiApi(base64ImageData, apiKey);
-                resultDiv.textContent = analysis;
-
-            } catch (error) {
-                console.error('Error:', error);
-                resultDiv.textContent = `Error: ${error.message}`;
-                resultDiv.className = 'error';
-            } finally {
-                loadingDiv.style.display = 'none';
-                captureButton.disabled = false;
-            }
-        });
-    }
+    // Removed the event listener for the captureButton as the button is gone.
 
     async function callGeminiApi(base64ImageData, key) {
         const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL_NAME}:generateContent?key=${key}`;

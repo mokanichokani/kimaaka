@@ -7,31 +7,30 @@
 <body>
     <!--
         The div#main-content is kept for potential JS hooks.
-        A table is used inside it to achieve horizontal layout without CSS.
+        It will be hidden by JS if no API key is found.
+        A table is used inside it.
     -->
-    <div id="main-content">
+    <div id="main-content"> <!-- JS will control its visibility via the 'hidden' attribute -->
         <table>
             <tr>
-                <td><button id="captureAndAnalyze">A</button></td>
-                <td>
+                <td> <!-- This td now directly contains the output-container -->
                     <!--
                         output-container is kept for potential JS hooks.
-                        It will contain either the loading indicator or the result textarea.
+                        It will contain either the loading indicator or the result.
                     -->
                     <div id="output-container">
                         <!--
-                            The 'loading' div is kept, its text content is "Loading...".
+                            The 'loading' div is kept, its text content is "L...".
                             It's hidden by default using the HTML 'hidden' attribute.
-                            popup.js should toggle this attribute (e.g., loading.hidden = false/true).
+                            popup.js should toggle this attribute.
                         -->
                         <div id="loading" hidden>L...</div>
                         <!--
-                            The 'result' element is now a textarea to allow 'cols' attribute for width.
-                            'cols="5"' makes it small (approx 5 characters wide).
-                            It's hidden by default. popup.js should toggle this attribute and set its value.
+                            The 'result' element is a div.
+                            popup.js will set its value.
                             It's readonly as it's for display.
                         -->
-                        <div id="result"  ></div>
+                        <div id="result"></div>
                     </div>
                 </td>
             </tr>
@@ -42,7 +41,6 @@
         The api-key-prompt div is kept.
         It's hidden by default using the HTML 'hidden' attribute.
         popup.js should toggle this attribute based on API key presence.
-        The class="api-key-missing" was removed as its styles are gone.
     -->
     <div id="api-key-prompt" hidden>
         <p>Set Gemini API Key in <a href="#" id="openOptions">options</a>.</p>
