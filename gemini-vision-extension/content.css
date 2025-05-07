@@ -1,0 +1,32 @@
+/* content.css - Just Plain Text */
+#gemini-vision-onpage-result {
+    position: fixed !important;
+    bottom: 15px !important;
+    left: 15px !important;
+    background-color: transparent !important;
+    color: #222222 !important; /* Default to dark text. This will be invisible on dark backgrounds. */
+                               /* You could try 'inherit' but it might be unpredictable. */
+    text-shadow: none !important; /* NO text shadow */
+    padding: 0px !important; /* NO padding */
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    z-index: 2147483647 !important;
+    max-width: 350px !important; /* Still good to have a max width for longer results */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji" !important;
+    font-size: 16px !important; /* Make it a bit larger if it's just a single character */
+    font-weight: 600 !important; /* Semi-bold might help it stand out slightly */
+    line-height: 1 !important;   /* Tight line height for single characters */
+    overflow-wrap: break-word !important;
+    border: none !important;
+    box-sizing: border-box !important;
+    opacity: 1; 
+    transition: opacity 0.3s ease-in-out; /* For fade out */
+    pointer-events: none; /* So it doesn't interfere with clicking things underneath */
+    /* Remove any specific styling for .loading or .error classes here */
+}
+
+/* Strong tag styling if used by error messages (though errors are now plain) */
+#gemini-vision-onpage-result strong {
+    font-weight: inherit !important; /* Match parent */
+    color: inherit !important;
+}

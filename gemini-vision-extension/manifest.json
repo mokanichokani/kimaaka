@@ -1,15 +1,16 @@
 {
   "manifest_version": 3,
-  "name": "Ad blocker lol",
-  "version": "0.2.0",
-  "description": "Captures the current window and sends it to Gemini for analysis.",
+  "name": "Gemini Vision Quick Analysis",
+  "version": "0.3.0",
+  "description": "Captures the current window, sends it to Gemini for analysis, and displays the result on-page.",
   "permissions": [
-    "activeTab",  // To capture the visible tab
-    "storage",    // To store the API key
-    "scripting"   // Needed for executeScript if we were injecting content scripts, but activeTab is enough for captureVisibleTab
+    "activeTab",
+    "storage",
+    "scripting",
+    "commands"
   ],
   "host_permissions": [
-    "https://generativelanguage.googleapis.com/" // To call the Gemini API
+    "https://generativelanguage.googleapis.com/"
   ],
   "action": {
     "default_popup": "popup.html",
@@ -27,5 +28,21 @@
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
-  }
+  },
+  "commands": {
+    "trigger_analysis": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+Y"
+      },
+      "description": "Capture screen and analyze with Gemini"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["content.css"]
+    }
+  ]
 }

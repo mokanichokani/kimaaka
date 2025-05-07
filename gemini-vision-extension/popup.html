@@ -2,48 +2,73 @@
 <html>
 <head>
     <title>Gemini Vision</title>
-    <!-- All CSS from the <style> block has been removed -->
+    <meta charset="UTF-
+    8">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            width: 280px;
+            padding: 15px;
+            font-size: 14px;
+            color: #333;
+        }
+        #main-content, #api-key-prompt {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        #output-container {
+            background-color: #f7f7f7;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 10px;
+            min-height: 60px;
+            max-height: 150px;
+            overflow-y: auto;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        #loading { font-style: italic; color: #666; }
+        button#triggerAnalysisButton {
+            padding: 10px 15px;
+            background-color: #007aff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+        }
+        button#triggerAnalysisButton:hover { background-color: #0056b3; }
+        #api-key-prompt p, .shortcut-info { margin: 0; }
+        .shortcut-info {
+            font-size: 12px;
+            color: #555;
+            text-align: center;
+            margin-top: 5px;
+            background-color: #f0f0f0;
+            padding: 5px;
+            border-radius: 3px;
+        }
+        a { color: #007aff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .hidden { display: none !important; }
+    </style>
 </head>
 <body>
-    <!--
-        The div#main-content is kept for potential JS hooks.
-        It will be hidden by JS if no API key is found.
-        A table is used inside it.
-    -->
-    <div id="main-content"> <!-- JS will control its visibility via the 'hidden' attribute -->
-        <table>
-            <tr>
-                <td> <!-- This td now directly contains the output-container -->
-                    <!--
-                        output-container is kept for potential JS hooks.
-                        It will contain either the loading indicator or the result.
-                    -->
-                    <div id="output-container">
-                        <!--
-                            The 'loading' div is kept, its text content is "L...".
-                            It's hidden by default using the HTML 'hidden' attribute.
-                            popup.js should toggle this attribute.
-                        -->
-                        <div id="loading" hidden>L...</div>
-                        <!--
-                            The 'result' element is a div.
-                            popup.js will set its value.
-                            It's readonly as it's for display.
-                        -->
-                        <div id="result"></div>
-                    </div>
-                </td>
-            </tr>
-        </table>
+    <div id="main-content" class="hidden">
+        <button id="triggerAnalysisButton">Analyze Current Tab</button>
+        <div id="output-container">
+            <div id="loading" class="hidden">Analyzing...</div>
+            <div id="result">Ready. Click button or use shortcut.</div>
+        </div>
+        <div class="shortcut-info">Shortcut: <span id="shortcutDisplay">Loading...</span></div>
     </div>
 
-    <!--
-        The api-key-prompt div is kept.
-        It's hidden by default using the HTML 'hidden' attribute.
-        popup.js should toggle this attribute based on API key presence.
-    -->
-    <div id="api-key-prompt" hidden>
-        <p>Set Gemini API Key in <a href="#" id="openOptions">options</a>.</p>
+    <div id="api-key-prompt" class="hidden">
+        <p>Please set your Gemini API Key in the <a href="#" id="openOptions">extension options</a> to enable analysis.</p>
     </div>
 
     <script src="popup.js"></script>
