@@ -1,6 +1,6 @@
 // background.js
 
-const GEMINI_MODEL_NAME = "gemini-2.5-pro-exp-03-25"; // Or your preferred model like "gemini-pro-vision"
+const GEMINI_MODEL_NAME = "gemini-2.5-flash-preview-04-17"; // Or your preferred model like "gemini-pro-vision"
 // const GEMINI_MODEL_NAME = "gemini-2.5-flash-preview-04-17"; // Original model from your code
 
 async function callGeminiApi(base64ImageData, apiKey, promptText) {
