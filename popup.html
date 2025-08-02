@@ -54,6 +54,35 @@
         a { color: #007aff; text-decoration: none; }
         a:hover { text-decoration: underline; }
         .hidden { display: none !important; }
+        .github-section {
+            margin-top: 10px;
+            padding: 8px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border: 1px solid #e1e5e9;
+        }
+        .github-links {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            font-size: 12px;
+        }
+        .star-request {
+            font-size: 11px;
+            color: #666;
+            text-align: center;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        .github-link {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .github-link::before {
+            content: "⭐";
+            font-size: 10px;
+        }
     </style>
 </head>
 <body>
@@ -64,6 +93,21 @@
             <div id="result">Ready to analyze! Click button or use shortcut.</div>
         </div>
         <div class="shortcut-info">Shortcut: <span id="shortcutDisplay">Loading...</span></div>
+        
+        <div class="github-section">
+            <div class="github-links">
+                <div class="github-link">
+                    <a href="https://github.com/mokanichokani/ISEkimaaka" target="_blank">GitHub Project</a>
+                </div>
+                <div class="github-link">
+                    <a href="https://github.com/mokanichokani" target="_blank">Developer Profile</a>
+                </div>
+            </div>
+            <div class="star-request">
+                ⭐ Please star the project if you find it useful!
+            </div>
+        </div>
+        
         <div style="font-size: 11px; color: #666; text-align: center; margin-top: 8px;">
             ISEkimaaka-moodle - No login required!
         </div>
