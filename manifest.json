@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "ISEkimaaka",
+  "name": "isekimaaka",
   "version": "3.0.0",
   "description": "Captures the current screen on any website, sends it to Gemini for analysis, and displays the result. Injects only on user command.",
   "permissions": [

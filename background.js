@@ -74,7 +74,7 @@ async function handleTriggerAnalysis(tab) {
     // Prevent the extension from trying to run on pages where it will fail,
     // like the Chrome Web Store, chrome:// pages, or blank new tabs.
     if (!tab || !tab.id || !tab.url || tab.url.startsWith("chrome://") || tab.url.startsWith("https://chrome.google.com")) {
-        console.log("ISEkimaaka cannot run on this protected page. Aborting.");
+        console.log("isekimaaka cannot run on this protected page. Aborting.");
         return; 
     }
     const currentTabId = tab.id;
