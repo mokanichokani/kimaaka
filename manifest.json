@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Gemini Vision Quick Analysis",
-  "version": "0.3.0",
-  "description": "Captures the current window, sends it to Gemini for analysis, and displays the result on-page.",
+  "name": "ISEkimaaka",
+  "version": "2.1.0",
+  "description": "An AI-powered analysis tool for any website. Analyzes screen content and provides intelligent responses.",
   "permissions": [
     "activeTab",
     "storage",
@@ -10,12 +10,15 @@
     "commands"
   ],
   "host_permissions": [
-    "https://generativelanguage.googleapis.com/"
+    "https://generativelanguage.googleapis.com/",
+    "https://server-t1gp.onrender.com/",
+    "<all_urls>"
   ],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
       "48": "icons/icon48.png",
       "128": "icons/icon128.png"
     }
@@ -26,6 +29,7 @@
   "options_page": "options.html",
   "icons": {
     "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
@@ -35,14 +39,7 @@
         "default": "Ctrl+Shift+Y",
         "mac": "Command+Shift+Y"
       },
-      "description": "Capture screen and analyze with Gemini"
+      "description": "Analyze content on current page"
     }
-  },
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"],
-      "css": ["content.css"]
-    }
-  ]
+  }
 }

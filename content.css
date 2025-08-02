@@ -1,4 +1,4 @@
-/* content.css - Just Plain Text */
+/* content.css - Plain Text with Colored Option Boxes */
 #gemini-vision-onpage-result {
     position: fixed !important;
     bottom: 15px !important;
@@ -23,6 +23,23 @@
     transition: opacity 0.3s ease-in-out; /* For fade out */
     pointer-events: none; /* So it doesn't interfere with clicking things underneath */
     /* Remove any specific styling for .loading or .error classes here */
+}
+
+/* Styling for colored option boxes */
+#gemini-vision-onpage-result .option-box {
+    display: inline-block !important;
+    width: 10px !important;
+    height: 10px !important;
+    border-radius: 0px !important;
+    color: white !important;
+    text-align: center !important;
+    line-height: 20px !important;
+    font-size: 12px !important;
+    font-weight: bold !important;
+    margin: 0 2px !important;
+    border: 1px solid rgba(0, 0, 0, 0.2) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5) !important;
 }
 
 /* Strong tag styling if used by error messages (though errors are now plain) */

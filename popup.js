@@ -2,13 +2,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     const resultDiv = document.getElementById('result');
     const loadingDiv = document.getElementById('loading');
-    const apiKeyPromptDiv = document.getElementById('api-key-prompt');
     const mainContentDiv = document.getElementById('main-content');
-    const openOptionsLink = document.getElementById('openOptions');
     const triggerAnalysisButton = document.getElementById('triggerAnalysisButton');
     const shortcutDisplay = document.getElementById('shortcutDisplay');
-
-    let apiKeyPresent = false;
 
     function updatePopupUI(isLoading, text, isError = false) {
         loadingDiv.classList.toggle('hidden', !isLoading);
@@ -19,21 +15,12 @@ document.addEventListener('DOMContentLoaded', () => {
         resultDiv.style.color = isError ? 'red' : 'inherit';
     }
 
-    chrome.storage.sync.get(['geminiApiKey'], (storageResult) => {
-        apiKeyPresent = !!storageResult.geminiApiKey;
-        mainContentDiv.classList.toggle('hidden', !apiKeyPresent);
-        apiKeyPromptDiv.classList.toggle('hidden', apiKeyPresent);
-        if (apiKeyPresent) {
-            updatePopupUI(false, 'Ready. Click button or use shortcut.');
-        }
-    });
+    // Show main content immediately since no login is required
+    mainContentDiv.classList.remove('hidden');
+    updatePopupUI(false, 'Ready to analyze! Click button or use shortcut.');
 
     if (triggerAnalysisButton) {
         triggerAnalysisButton.addEventListener('click', () => {
-            if (!apiKeyPresent) {
-                updatePopupUI(false, 'API Key not set. Please set it in options.', true);
-                return;
-            }
             updatePopupUI(true, '');
             chrome.runtime.sendMessage({ action: "triggerAnalysisFromPopup" }, (response) => {
                 if (chrome.runtime.lastError) {
@@ -47,29 +34,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if (openOptionsLink) {
-        openOptionsLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            chrome.runtime.sendMessage({ action: "openOptionsPage" });
-            window.close();
-        });
-    }
-
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         if (request.action === "analysis_started_for_popup") {
-            if (apiKeyPresent) updatePopupUI(true, '');
+            updatePopupUI(true, '');
         } else if (request.action === "analysis_complete_for_popup") {
-            if (apiKeyPresent) {
-                if (request.error) {
-                    updatePopupUI(false, `Error: ${request.error}`, true);
-                } else {
-                    updatePopupUI(false, request.result || "No result text.");
-                }
+            if (request.error) {
+                updatePopupUI(false, `Error: ${request.error}`, true);
+            } else {
+                updatePopupUI(false, request.result || "No result text.");
             }
         }
-        // Important: Acknowledge message if you're not sending an async response later
-        // For simple UI updates, synchronous acknowledgement is fine.
-        // sendResponse({status: "received"});
     });
 
     if (shortcutDisplay) {

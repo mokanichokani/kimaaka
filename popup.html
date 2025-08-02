@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Gemini Vision</title>
-    <meta charset="UTF-
-    8">
+    <title>ISEkimaaka - Vision</title>
+    <meta charset="UTF-8">
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -58,17 +57,16 @@
     </style>
 </head>
 <body>
-    <div id="main-content" class="hidden">
+    <div id="main-content">
         <button id="triggerAnalysisButton">Analyze Current Tab</button>
         <div id="output-container">
             <div id="loading" class="hidden">Analyzing...</div>
-            <div id="result">Ready. Click button or use shortcut.</div>
+            <div id="result">Ready to analyze! Click button or use shortcut.</div>
         </div>
         <div class="shortcut-info">Shortcut: <span id="shortcutDisplay">Loading...</span></div>
-    </div>
-
-    <div id="api-key-prompt" class="hidden">
-        <p>Please set your Gemini API Key in the <a href="#" id="openOptions">extension options</a> to enable analysis.</p>
+        <div style="font-size: 11px; color: #666; text-align: center; margin-top: 8px;">
+            ISEkimaaka - No login required!
+        </div>
     </div>
 
     <script src="popup.js"></script>

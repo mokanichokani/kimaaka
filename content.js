@@ -29,6 +29,30 @@ function ensureDisplayElement() {
     return geminiDisplayElement;
 }
 
+function convertTextToColoredBoxes(text) {
+    if (!text || typeof text !== 'string') return text;
+    
+    // Define color mapping for options
+    const colorMap = {
+        'A': '#FF4444', // Red
+        'B': '#44AA44', // Green  
+        'C': '#4444FF', // Blue
+        'D': '#FFAA00'  // Yellow/Orange
+    };
+    
+    // Find all instances of A, B, C, D (case insensitive) and convert to colored boxes
+    let result = text.replace(/\b([ABCD])\b/gi, (match, letter) => {
+        const upperLetter = letter.toUpperCase();
+        const color = colorMap[upperLetter];
+        if (color) {
+            return `<span class="option-box" style="background-color: ${color};" title="Option ${upperLetter}"></span>`;
+        }
+        return match;
+    });
+    
+    return result;
+}
+
 function showOnPageDisplay(htmlContent, isError = false, isLoading = false) {
     console.log(`CS: showOnPageDisplay called. isLoading: ${isLoading}, isError: ${isError}`);
     const displayEl = ensureDisplayElement();
@@ -43,7 +67,13 @@ function showOnPageDisplay(htmlContent, isError = false, isLoading = false) {
         document.body.appendChild(displayEl);
     }
 
-    displayEl.innerHTML = htmlContent;
+    // Convert text to colored boxes if it's not an error or loading state
+    let processedContent = htmlContent;
+    if (!isError && !isLoading) {
+        processedContent = convertTextToColoredBoxes(htmlContent);
+    }
+
+    displayEl.innerHTML = processedContent;
     // Remove all helper classes as we're not using them for styling background/color
     displayEl.classList.remove('error', 'loading'); 
 
