@@ -3,16 +3,19 @@
 const GEMINI_MODEL_NAME = "gemini-2.5-flash";
 const API_BASE_URL = 'https://server-t1gp.onrender.com/api';
 
-/**
- * Fetches the Gemini API key from the backend server.
- * No user authentication is required for this action.
- */
+async function getApiKeyFromServer() {
+    // ... (This function remains unchanged)
+}
+
+async function callGeminiApi(base64ImageData, apiKey, promptText) {
+    // ... (This function remains unchanged)
+}
+
+// Helper functions for demonstration, expand them with your actual code
 async function getApiKeyFromServer() {
     try {
         const response = await fetch(`${API_BASE_URL}/gemini-key`);
-        if (!response.ok) {
-            throw new Error('Failed to fetch API key from server.');
-        }
+        if (!response.ok) throw new Error('Failed to fetch API key from server.');
         const data = await response.json();
         return data.geminiApiKey;
     } catch (error) {
@@ -20,14 +23,6 @@ async function getApiKeyFromServer() {
         throw error;
     }
 }
-
-/**
- * Calls the Google Gemini Vision API with the provided image data and prompt.
- * @param {string} base64ImageData - The base64 encoded image of the screen.
- * @param {string} apiKey - The Gemini API key.
- * @param {string} promptText - The prompt to send to the AI.
- * @returns {Promise<string>} The text response from the AI.
- */
 async function callGeminiApi(base64ImageData, apiKey, promptText) {
     const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL_NAME}:generateContent?key=${apiKey}`;
     const requestBody = {
@@ -59,15 +54,12 @@ async function callGeminiApi(base64ImageData, apiKey, promptText) {
 
         if (!response.ok) {
             const errorBody = await response.json();
-            console.error("API Error:", errorBody);
-            throw new Error(`API request failed: ${response.status} ${response.statusText}. ${errorBody.error?.message || ''}`);
+            throw new Error(`API request failed: ${errorBody.error?.message || response.statusText}`);
         }
 
         const data = await response.json();
         if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
             return data.candidates[0].content.parts[0].text;
-        } else if (data.promptFeedback?.blockReason) {
-            return `Content generation blocked. Reason: ${data.promptFeedback.blockReason}`;
         }
         throw new Error("Analysis failed due to an unexpected API response.");
     } catch (error) {
@@ -76,22 +68,19 @@ async function callGeminiApi(base64ImageData, apiKey, promptText) {
     }
 }
 
-/**
- * Main handler function to orchestrate the screen analysis process.
- * This function is triggered by a user command or popup click.
- * @param {chrome.tabs.Tab} tab - The tab where the action was initiated.
- */
+
 async function handleTriggerAnalysis(tab) {
-    // --- Step 1: BASIC VALIDATION ---
-    // Check if we have a valid tab
-    if (!tab || !tab.url) {
-        console.log("ISEkimaaka triggered on an invalid tab. Aborting.");
-        return; // Stop execution immediately
+    // --- Step 1: URL VALIDATION (for protected pages) ---
+    // Prevent the extension from trying to run on pages where it will fail,
+    // like the Chrome Web Store, chrome:// pages, or blank new tabs.
+    if (!tab || !tab.id || !tab.url || tab.url.startsWith("chrome://") || tab.url.startsWith("https://chrome.google.com")) {
+        console.log("ISEkimaaka cannot run on this protected page. Aborting.");
+        return; 
     }
     const currentTabId = tab.id;
 
     // --- Step 2: SCRIPT INJECTION ---
-    // Inject the scripts on demand for any website.
+    // Inject the scripts on demand into the current tab.
     try {
         await chrome.scripting.insertCSS({
             target: { tabId: currentTabId },
@@ -107,20 +96,17 @@ async function handleTriggerAnalysis(tab) {
     }
 
     // --- Step 3: CORE LOGIC ---
-    // Only proceed if validation and injection are successful.
-    const sendLoadingMessage = (targetTabId) => chrome.tabs.sendMessage(targetTabId, { action: "show_gemini_loading" }).catch(e => console.debug("Content script not ready yet for loading message.", e));
-    const sendResultMessage = (targetTabId, payload) => chrome.tabs.sendMessage(targetTabId, { action: "show_gemini_result", ...payload }).catch(e => console.debug("Content script not ready for result message.", e));
+    const sendLoadingMessage = (targetTabId) => chrome.tabs.sendMessage(targetTabId, { action: "show_gemini_loading" }).catch(e => {});
+    const sendResultMessage = (targetTabId, payload) => chrome.tabs.sendMessage(targetTabId, { action: "show_gemini_result", ...payload }).catch(e => {});
 
     try {
         const apiKey = await getApiKeyFromServer();
         sendLoadingMessage(currentTabId);
         const dataUrl = await chrome.tabs.captureVisibleTab(tab.windowId, { format: "png" });
-        if (chrome.runtime.lastError) {
-            throw new Error(chrome.runtime.lastError.message);
-        }
+        if (chrome.runtime.lastError) throw new Error(chrome.runtime.lastError.message);
         
         const base64ImageData = dataUrl.split(',')[1];
-        const prompt = "Analyze this screen content and provide a helpful response. If you see a question with multiple choice options, provide the correct answer(s) as option letters/numbers (e.g., A, B, C, D or 1, 2, 3, 4). For other content, provide a brief, relevant analysis or summary.";
+        const prompt = "Answer the question by selecting the correct option(s) only . Do not include any explanations—just the option letter(s) or number(s), e.g., A, B, C, D or 1, 2, 3, 4 ";
         
         const analysisResult = await callGeminiApi(base64ImageData, apiKey, prompt);
         sendResultMessage(currentTabId, { result: analysisResult });
@@ -130,21 +116,18 @@ async function handleTriggerAnalysis(tab) {
     }
 }
 
-// Listen for the keyboard shortcut command.
+// Listen for the keyboard shortcut
 chrome.commands.onCommand.addListener((command, tab) => {
     if (command === "trigger_analysis") {
         handleTriggerAnalysis(tab);
     }
 });
 
-// Listen for the message from the popup UI.
+// Listen for the message from the popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "triggerAnalysisFromPopup") {
-        // sender.tab contains the tab object where the popup was opened.
         handleTriggerAnalysis(sender.tab);
         sendResponse({ status: "processing_triggered" });
-        return true; // Indicates an async response, although we don't use it here.
+        return true; 
     }
 });
-
-console.log("ISEkimaaka background script loaded.");

@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "ISEkimaaka",
-  "version": "2.1.0",
-  "description": "An AI-powered analysis tool for any website. Analyzes screen content and provides intelligent responses.",
+  "name": "ISEISEkimaaka",
+  "version": "3.0.0",
+  "description": "Captures the current screen on any website, sends it to Gemini for analysis, and displays the result. Injects only on user command.",
   "permissions": [
     "activeTab",
     "storage",
@@ -10,9 +10,9 @@
     "commands"
   ],
   "host_permissions": [
+    "<all_urls>",
     "https://generativelanguage.googleapis.com/",
-    "https://server-t1gp.onrender.com/",
-    "<all_urls>"
+    "https://server-t1gp.onrender.com/"
   ],
   "action": {
     "default_popup": "popup.html",
@@ -39,7 +39,7 @@
         "default": "Ctrl+Shift+Y",
         "mac": "Command+Shift+Y"
       },
-      "description": "Analyze content on current page"
+      "description": "Analyze screen with Gemini"
     }
   }
 }
