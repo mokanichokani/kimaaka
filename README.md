@@ -1,5 +1,7 @@
 # 🎯 ISEkimaaka - AI-Powered Multiple Choice Assistant
 
+![ISEkimaaka Logo](isekimaaka.png)
+
 **Version:** 3.0.0  
 **Description:** An intelligent Chrome extension system that captures screenshots and uses Google's Gemini AI to automatically solve multiple choice questions with visual colored indicators.
 
