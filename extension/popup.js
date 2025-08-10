@@ -17,13 +17,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const donateButton = document.getElementById('donateButton');
     const donateStatus = document.getElementById('donateStatus');
 
-    function updatePopupUI(isLoading, text, isError = false) {
+    function updatePopupUI(isLoading, text, rror = false) {
         loadingDiv.classList.toggle('hidden', !isLoading);
         resultDiv.classList.toggle('hidden', isLoading);
         if (text) {
             resultDiv.textContent = text;
         }
-        resultDiv.style.color = isError ? 'red' : 'inherit';
+        resultDiv.style.color = rror ? 'red' : 'inherit';
     }
 
     function showDonationStatus(message, type = 'loading') {

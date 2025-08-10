@@ -4,7 +4,7 @@
 
 const SERVER_CONFIG = {
     // Environment: 'development' or 'production'
-    ENVIRONMENT: 'development', // Change to 'production' when deploying
+    ENVIRONMENT: 'production', // Changed to production for Render deployment
     
     // Development Configuration (localhost)
     DEVELOPMENT: {
@@ -15,14 +15,13 @@ const SERVER_CONFIG = {
     
     // Production Configuration (Render URLs)
     PRODUCTION: {
-        // Replace these with your actual Render service URLs
+        // Kimaaka production servers on Render
         URLS: [
-            'https://your-app-1.onrender.com',
-            'https://your-app-2.onrender.com',
-            'https://your-app-3.onrender.com',
-            'https://your-app-4.onrender.com',
-            'https://your-app-5.onrender.com',
-            'https://your-app-6.onrender.com'
+            'https://kimaakaserver1.onrender.com',
+            'https://kimaakaserver2.onrender.com',
+            'https://kimaakaserver3.onrender.com',
+            'https://kimaakaserver4.onrender.com',
+            'https://kimaakaserver5.onrender.com'
         ]
     },
     

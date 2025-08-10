@@ -20,9 +20,66 @@ if (process.env.MONGODB_URI) {
 
 const app = express();
 
+// Enhanced CORS configuration for Chrome Extension and Admin Dashboard
+const corsOptions = {
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps, Postman, Chrome extensions)
+        if (!origin) return callback(null, true);
+        
+        // Allow Chrome extension origins
+        if (origin.startsWith('chrome-extension://')) {
+            return callback(null, true);
+        }
+        
+        // Allow moz-extension for Firefox
+        if (origin.startsWith('moz-extension://')) {
+            return callback(null, true);
+        }
+        
+        // Allow localhost for development
+        if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+            return callback(null, true);
+        }
+        
+        // Allow admin dashboard origins
+        const allowedOrigins = [
+            'https://kimaaka-admin.netlify.app',
+            'https://kimaaka-admin.vercel.app',
+            'null' // For local file access
+        ];
+        
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+        
+        // Allow all origins for now (can be restricted later)
+        return callback(null, true);
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    optionsSuccessStatus: 200 // Some legacy browsers choke on 204
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
+
+// Additional CORS headers for Chrome Extensions
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    
+    // Handle preflight requests
+    if (req.method === 'OPTIONS') {
+        res.sendStatus(200);
+        return;
+    }
+    
+    next();
+});
 
 // Logging middleware to track all requests
 app.use((req, res, next) => {
@@ -820,19 +877,49 @@ app.get('/api/health', async (req, res) => {
             3: 'disconnecting'
         };
         
-        const [adminKeysCount, donatedKeysCount] = await Promise.all([
+        const [adminKeysCount, donatedKeysCount, totalUsers, serverUsage] = await Prom.all([
             ApiKey.countDocuments({ status: 'active' }),
-            DonatedApiKey.countDocuments({ status: 'active' })
+            DonatedApiKey.countDocuments({ status: 'active' }),
+            User.countDocuments(),
+            ServerUsage.findOne({ serverUrl: process.env.RENDER_EXTERNAL_URL || `http://localhost:${port}` })
         ]);
 
         if (dbState === 1) {
             await mongoose.connection.db.admin().ping();
+            
+            // Calculate additional statistics
+            const memoryUsage = process.memoryUsage();
+            const memoryUsageMB = {
+                rss: Math.round(memoryUsage.rss / 1024 / 1024),
+                heapTotal: Math.round(memoryUsage.heapTotal / 1024 / 1024),
+                heapUsed: Math.round(memoryUsage.heapUsed / 1024 / 1024),
+                external: Math.round(memoryUsage.external / 1024 / 1024)
+            };
+            
+            // Server usage statistics
+            const usageStats = serverUsage ? {
+                totalAllocations: serverUsage.totalAllocations,
+                totalApiCalls: serverUsage.totalApiCalls,
+                successfulRequests: serverUsage.successfulRequests,
+                failedRequests: serverUsage.failedRequests,
+                averageResponseTime: serverUsage.averageResponseTime,
+                lastUsed: serverUsage.lastUsed,
+                uptime: Math.floor(process.uptime())
+            } : null;
+            
             res.json({ 
                 status: 'healthy', 
                 database: 'connected',
                 uptime: process.uptime(),
-                memory: process.memoryUsage(),
+                memory: memoryUsage,
+                memoryMB: memoryUsageMB,
+                adminKeysCount,
+                donatedKeysCount,
+                totalUsers,
                 apiKeysCount: adminKeysCount + donatedKeysCount,
+                serverStats: usageStats,
+                nodeVersion: process.version,
+                platform: process.platform,
                 timestamp: new Date().toISOString()
             });
         } else {
@@ -1358,7 +1445,7 @@ app.delete('/api/admin/auth/users/:userId', authenticateToken, async (req, res) 
 // Get admin stats for overview
 app.get('/api/admin/stats', authenticateToken, async (req, res) => {
     try {
-        const [totalApiKeys, activeApiKeys, donatedApiKeys, totalUsers] = await Promise.all([
+        const [totalApiKeys, activeApiKeys, donatedApiKeys, totalUsers] = await Prom.all([
             ApiKey.countDocuments(),
             ApiKey.countDocuments({ status: 'active' }),
             DonatedApiKey.countDocuments({ status: 'active' }),
@@ -1568,7 +1655,7 @@ app.post('/api/admin/reset-server-stats', authenticateToken, async (req, res) =>
 // Get all API keys for management (unified)
 app.get('/api/admin/api-keys', authenticateToken, async (req, res) => {
     try {
-        const [adminKeys, donatedKeys] = await Promise.all([
+        const [adminKeys, donatedKeys] = await Prom.all([
             ApiKey.find().sort({ createdAt: -1 }),
             DonatedApiKey.find().sort({ createdAt: -1 })
         ]);
@@ -1713,7 +1800,7 @@ app.post('/api/admin/api-keys/:keyId/validate', authenticateToken, async (req, r
 // Validate all API keys
 app.post('/api/admin/api-keys/validate-all', authenticateToken, async (req, res) => {
     try {
-        const [adminKeys, donatedKeys] = await Promise.all([
+        const [adminKeys, donatedKeys] = await Prom.all([
             ApiKey.find(),
             DonatedApiKey.find()
         ]);
@@ -1864,7 +1951,7 @@ app.post('/api/admin/settings', authenticateToken, async (req, res) => {
 // Reset allocation counts
 app.post('/api/admin/reset-allocation', authenticateToken, async (req, res) => {
     try {
-        await Promise.all([
+        await Prom.all([
             ApiKey.updateMany({}, { allocationCount: 0 }),
             DonatedApiKey.updateMany({}, { allocationCount: 0 })
         ]);
@@ -1879,7 +1966,7 @@ app.post('/api/admin/reset-allocation', authenticateToken, async (req, res) => {
 // Clear inactive keys
 app.delete('/api/admin/clear-inactive', authenticateToken, async (req, res) => {
     try {
-        const [adminResult, donatedResult] = await Promise.all([
+        const [adminResult, donatedResult] = await Prom.all([
             ApiKey.deleteMany({ status: 'deactivated' }),
             DonatedApiKey.deleteMany({ status: 'deactivated' })
         ]);
@@ -1899,7 +1986,7 @@ app.delete('/api/admin/clear-inactive', authenticateToken, async (req, res) => {
 // Export data
 app.get('/api/admin/export', authenticateToken, async (req, res) => {
     try {
-        const [adminKeys, donatedKeys, users] = await Promise.all([
+        const [adminKeys, donatedKeys, users] = await Prom.all([
             ApiKey.find().select('-apiKey'),
             DonatedApiKey.find().select('-apiKey'),
             User.find().select('-password')
@@ -1957,7 +2044,7 @@ const PORT = process.env.PORT || SERVER_CONFIG.getDefaultPort();
 
 // Function to find an available port
 const findAvailablePort = (startPort) => {
-    return new Promise((resolve, reject) => {
+    return new Prom((resolve, reject) => {
         const server = require('net').createServer();
         server.listen(startPort, (err) => {
             if (err) {

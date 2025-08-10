@@ -1,4 +1,4 @@
-# ⚙️ ISEkimaaka Server
+# ⚙️ kimaaka Server
 
 **Version:** 2.0.0  
 **Type:** Node.js Express Server  
@@ -6,7 +6,7 @@
 
 ## 🌟 Overview
 
-The ISEkimaaka Server is the backend component that manages Google Gemini API keys, provides failover capabilities, and serves as the bridge between the Chrome extension and AI services.
+The kimaaka Server is the backend component that manages Google Gemini API keys, provides failover capabilities, and serves as the bridge between the Chrome extension and AI services.
 
 ## ✨ Features
 
@@ -53,7 +53,7 @@ server/
 1. **Clone Repository**
    ```bash
    git clone <repository-url>
-   cd ISEkimaaka/server
+   cd kimaaka/server
    ```
 
 2. **Install Dependencies**
@@ -155,7 +155,7 @@ GET /api/status
 **Response**:
 ```json
 {
-  "server": "ISEkimaaka Server",
+  "server": "kimaaka Server",
   "version": "2.0.0",
   "port": 3000,
   "environment": "development",

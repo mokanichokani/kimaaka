@@ -1,10 +1,10 @@
 // config.js - Admin Dashboard Server Configuration
 // This file contains the server URLs used by the admin dashboard
-// Modify this file to change server ports or add/remove servers
+// Modify this file to change server configuration or add/remove servers
 
 const SERVER_CONFIG = {
     // Environment: 'development' or 'production'
-    ENVIRONMENT: 'development', // Change to 'production' when deploying
+    ENVIRONMENT: 'production', // Changed to production for deployment
     
     // Development Configuration (localhost)
     DEVELOPMENT: {
@@ -13,16 +13,15 @@ const SERVER_CONFIG = {
         PROTOCOL: 'http'
     },
     
-    // Production Configuration (Your backend server URLs)
+    // Production Configuration (Example servers)
     PRODUCTION: {
-        // Replace these with your actual backend server URLs
+        // Example production servers
         URLS: [
-            'https://your-backend-1.onrender.com',
-            'https://your-backend-2.onrender.com',
-            'https://your-backend-3.onrender.com',
-            'https://your-backend-4.onrender.com',
-            'https://your-backend-5.onrender.com',
-            'https://your-backend-6.onrender.com'
+            'https://moonlight-api.onrender.com',
+            'https://stardust-server.onrender.com',
+            'https://aurora-backend.onrender.com',
+            'https://nebula-service.onrender.com',
+            'https://comet-gateway.onrender.com'
         ]
     },
     

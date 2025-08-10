@@ -64,8 +64,8 @@ function convertTextToColoredBoxes(text) {
     return result;
 }
 
-function showOnPageDisplay(htmlContent, isError = false, isLoading = false) {
-    console.log(`CS: showOnPageDisplay called. isLoading: ${isLoading}, isError: ${isError}`);
+function showOnPageDisplay(htmlContent, rror = false, isLoading = false) {
+    console.log(`CS: showOnPageDisplay called. isLoading: ${isLoading}, rror: ${rror}`);
     const displayEl = ensureDisplayElement();
 
     if (!displayEl) {
@@ -80,7 +80,7 @@ function showOnPageDisplay(htmlContent, isError = false, isLoading = false) {
 
     // Convert text to colored boxes if it's not an error or loading state
     let processedContent = htmlContent;
-    if (!isError && !isLoading) {
+    if (!rror && !isLoading) {
         processedContent = convertTextToColoredBoxes(htmlContent);
     }
 
@@ -97,7 +97,7 @@ function showOnPageDisplay(htmlContent, isError = false, isLoading = false) {
     }
 
     if (!isLoading) {
-        const hideDelay = isError ? 8000 : 1500; // Adjust as needed
+        const hideDelay = rror ? 8000 : 1500; // Adjust as needed
         console.log(`CS: Setting auto-hide timer for ${hideDelay}ms.`);
         displayTimeoutId = setTimeout(() => {
             if (geminiDisplayElement) {

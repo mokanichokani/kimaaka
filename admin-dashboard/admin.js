@@ -57,7 +57,7 @@ async function handleLogin(event) {
         }
     } catch (error) {
         console.error('Login error:', error);
-        showLoginError(error.message || 'Connection error. Please check if any server is running on ports 3000-3004.');
+        showLoginError(error.message || 'Connection error. Please check if any server is available.');
     }
 }
 
@@ -121,14 +121,14 @@ function showDashboard() {
     document.getElementById('dashboardContainer').style.display = 'block';
 }
 
-function showLoginError(message, isError = true) {
+function showLoginError(message, rror = true) {
     const errorElement = document.getElementById('loginError');
     errorElement.textContent = message;
     errorElement.classList.remove('hidden');
     
     // If it's an error message, hide after 5 seconds
     // If it's a loading message, don't auto-hide
-    if (isError) {
+    if (rror) {
         setTimeout(() => {
             errorElement.classList.add('hidden');
         }, 5000);
@@ -188,10 +188,6 @@ function loadTabData(tabName) {
         case 'servers':
             checkAllServers();
             break;
-        case 'server-usage':
-            refreshServerUsage();
-            loadServerAnalytics();
-            break;
         case 'users':
             loadUsers();
             break;
@@ -201,11 +197,15 @@ function loadTabData(tabName) {
 // Overview functions
 async function loadOverview() {
     try {
-        const serverUrl = getRandomServerUrl();
-        const response = await fetch(`${serverUrl}/api/admin/stats`, {
-            headers: getAuthHeaders()
-        });
-        const stats = await response.json();
+        // Check authentication first
+        if (!authToken) {
+            console.warn('No authentication token for overview');
+            showAlert('Please log in to view statistics', 'error');
+            return;
+        }
+        
+        // Get aggregated statistics from all available servers
+        const stats = await getAggregatedServerStats();
         
         document.getElementById('totalApiKeys').textContent = stats.totalApiKeys || 0;
         document.getElementById('activeApiKeys').textContent = stats.activeApiKeys || 0;
@@ -215,7 +215,11 @@ async function loadOverview() {
         loadRecentActivity();
     } catch (error) {
         console.error('Error loading overview:', error);
-        showAlert('Failed to load overview data', 'error');
+        if (error.message.includes('Authentication required')) {
+            showAlert('Authentication required. Please log in to view admin statistics.', 'error');
+        } else {
+            showAlert('Failed to load overview data', 'error');
+        }
     }
 }
 
@@ -423,12 +427,27 @@ async function checkAllServers() {
     const container = document.getElementById('serversList');
     container.innerHTML = '<div class="loading">Checking server status...</div>';
     
-    const serverPromises = SERVER_URLS.map(async (url, index) => {
-        const serverPort = url.split(':')[2].split('/')[0];
+    // Get base URLs for health checks (without /api)
+    const baseUrls = window.SERVER_CONFIG ? window.SERVER_CONFIG.getBaseUrls() : [];
+    
+    const serverProms = baseUrls.map(async (baseUrl, index) => {
+        // Extract server identifier (port for localhost, domain for production)
+        let serverIdentifier;
+        if (baseUrl.includes('localhost')) {
+            serverIdentifier = `Port ${baseUrl.split(':')[2]}`;
+        } else {
+            // For production URLs like https://example-server1.onrender.com
+            const domain = baseUrl.replace('https://', '').replace('http://', '');
+            serverIdentifier = domain;
+        }
+        
         try {
-            const response = await fetch(`${url}/health`, {
+            const response = await fetch(`${baseUrl}/api/health`, {
                 method: 'GET',
-                timeout: 5000
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
             });
             
             const isOnline = response.ok;
@@ -436,16 +455,16 @@ async function checkAllServers() {
             
             return {
                 index: index + 1,
-                url,
-                port: serverPort,
+                url: baseUrl,
+                identifier: serverIdentifier,
                 status: isOnline ? 'online' : 'offline',
                 data: data
             };
         } catch (error) {
             return {
                 index: index + 1,
-                url,
-                port: serverPort,
+                url: baseUrl,
+                identifier: serverIdentifier,
                 status: 'offline',
                 error: error.message
             };
@@ -453,38 +472,46 @@ async function checkAllServers() {
     });
     
     try {
-        const serverStatuses = await Promise.all(serverPromises);
+        const serverStatuses = await Prom.all(serverProms);
         
         container.innerHTML = serverStatuses.map(server => `
             <div class="server-card">
                 <div class="server-status">
                     <div class="status-indicator ${server.status === 'online' ? 'status-online' : 'status-offline'}"></div>
-                    <strong>Server ${server.index} (Port ${server.port})</strong>
+                    <strong>Server ${server.index} (${server.identifier})</strong>
                 </div>
                 <p><strong>Status:</strong> ${server.status.toUpperCase()}</p>
                 <p><strong>URL:</strong> ${server.url}</p>
                 ${server.data ? `
-                    <p><strong>Uptime:</strong> ${server.data.uptime || 'Unknown'}</p>
-                    <p><strong>Memory:</strong> ${server.data.memory || 'Unknown'}</p>
-                    <p><strong>API Keys:</strong> ${server.data.apiKeysCount || 0}</p>
+                    <p><strong>Database:</strong> ${server.data.database || 'Unknown'}</p>
+                    <p><strong>Uptime:</strong> ${Math.floor(server.data.uptime || 0)}s</p>
+                    <p><strong>Admin Keys:</strong> ${server.data.adminKeysCount || 0}</p>
+                    <p><strong>Donated Keys:</strong> ${server.data.donatedKeysCount || 0}</p>
                 ` : ''}
                 ${server.error ? `<p><strong>Error:</strong> ${server.error}</p>` : ''}
                 <button class="btn btn-primary btn-sm" onclick="restartServer('${server.url}')">Restart</button>
             </div>
         `).join('');
     } catch (error) {
-        container.innerHTML = '<p>Failed to check server status</p>';
+        console.error('Error checking servers:', error);
+        container.innerHTML = '<p>Failed to check server status. Please check the console for details.</p>';
     }
 }
 
 async function getOnlineServerCount() {
     let onlineCount = 0;
     
-    const promises = SERVER_URLS.map(async (url) => {
+    // Get base URLs for health checks (without /api)
+    const baseUrls = window.SERVER_CONFIG ? window.SERVER_CONFIG.getBaseUrls() : [];
+    
+    const proms = baseUrls.map(async (baseUrl) => {
         try {
-            const response = await fetch(`${url}/health`, {
+            const response = await fetch(`${baseUrl}/api/health`, {
                 method: 'GET',
-                timeout: 3000
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
             });
             return response.ok;
         } catch {
@@ -492,7 +519,7 @@ async function getOnlineServerCount() {
         }
     });
     
-    const results = await Promise.all(promises);
+    const results = await Prom.all(proms);
     return results.filter(Boolean).length;
 }
 
@@ -545,11 +572,13 @@ async function loadUsers() {
                                 Created: ${new Date(user.createdAt).toLocaleDateString()}
                                 ${user.isDefault ? ' | Default User' : ''}
                                 ${user.lastLogin ? ` | Last login: ${new Date(user.lastLogin).toLocaleDateString()}` : ' | Never logged in'}
+                                ${user.allocatedServer ? ` | Server: ${user.allocatedServer}` : ' | Not allocated'}
                             </div>
                         </div>
                         <div class="user-actions">
                             ${!user.isDefault ? `
                                 <button class="btn btn-warning btn-sm" onclick="editUser('${user._id}', '${user.username}')">Edit Password</button>
+                                <button class="btn btn-info btn-sm" onclick="reallocateUser('${user._id}', '${user.username}')">🔄 Reallocate</button>
                                 <button class="btn btn-danger btn-sm" onclick="deleteUser('${user._id}', '${user.username}')">Delete</button>
                             ` : `
                                 <span style="color: #6b7280; font-size: 12px;">System User</span>
@@ -665,6 +694,60 @@ async function deleteUser(userId, username) {
     }
 }
 
+// Function to reallocate user (delete their current API key allocation)
+async function reallocateUser(userId, username) {
+    if (!confirm(`Are you sure you want to reallocate user "${username}"? This will delete their current API key allocation so they can get a new one.`)) {
+        return;
+    }
+    
+    try {
+        const serverUrl = getRandomServerUrl();
+        const response = await fetch(`${serverUrl}/api/admin/users/${userId}/reallocate`, {
+            method: 'POST',
+            headers: getAuthHeaders()
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok && result.success) {
+            showAlert(`User "${username}" has been reallocated. They can now get a new API key.`, 'success');
+            loadUsers();
+        } else {
+            showAlert(result.error || 'Failed to reallocate user', 'error');
+        }
+    } catch (error) {
+        console.error('Error reallocating user:', error);
+        showAlert('Failed to reallocate user. Please check server connection.', 'error');
+    }
+}
+
+// Function to delete user's API key allocation from a specific server
+async function deleteUserServerAllocation(userId, username, serverUrl) {
+    if (!confirm(`Are you sure you want to delete user "${username}"'s allocation from server ${serverUrl}? They can get reallocated to another server.`)) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${serverUrl}/api/admin/users/${userId}/allocation`, {
+            method: 'DELETE',
+            headers: getAuthHeaders()
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok && result.success) {
+            showAlert(`User "${username}" has been deallocated from server. They can now get reallocated.`, 'success');
+            loadUsers();
+            refreshServerUsage(); // Refresh server usage to show updated numbers
+        } else {
+            showAlert(result.error || 'Failed to delete user allocation', 'error');
+        }
+    } catch (error) {
+        console.error('Error deleting user allocation:', error);
+        showAlert('Failed to delete user allocation. Please check server connection.', 'error');
+    }
+}
+
 // Settings functions
 async function saveSettings() {
     const keyRotationInterval = document.getElementById('keyRotationInterval').value;
@@ -753,7 +836,7 @@ async function exportData() {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `kimaaka-backup-${new Date().toISOString().split('T')[0]}.json`;
+        a.download = `api-backup-${new Date().toISOString().split('T')[0]}.json`;
         a.click();
         URL.revokeObjectURL(url);
         
@@ -771,7 +854,10 @@ async function findWorkingServer() {
         try {
             const response = await fetch(`${workingServerUrl}/api/health`, { 
                 method: 'GET',
-                timeout: 3000 
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
             });
             if (response.ok) {
                 return workingServerUrl;
@@ -782,19 +868,25 @@ async function findWorkingServer() {
         }
     }
     
+    // Get base URLs for health checks
+    const baseUrls = window.SERVER_CONFIG ? window.SERVER_CONFIG.getBaseUrls() : [];
+    
     // Try servers sequentially from 1 to 5
-    for (let i = 0; i < SERVER_URLS.length; i++) {
-        const serverUrl = SERVER_URLS[i];
+    for (let i = 0; i < baseUrls.length; i++) {
+        const baseUrl = baseUrls[i];
         try {
-            console.log(`Trying server ${i + 1}: ${serverUrl}`);
-            const response = await fetch(`${serverUrl.replace('/api', '')}/api/health`, { 
+            console.log(`Trying server ${i + 1}: ${baseUrl}`);
+            const response = await fetch(`${baseUrl}/api/health`, { 
                 method: 'GET',
-                signal: AbortSignal.timeout(3000) // 3 second timeout
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
             });
             
             if (response.ok) {
-                console.log(`✅ Server ${i + 1} is working: ${serverUrl}`);
-                workingServerUrl = serverUrl.replace('/api', '');
+                console.log(`✅ Server ${i + 1} is working: ${baseUrl}`);
+                workingServerUrl = baseUrl;
                 return workingServerUrl;
             }
         } catch (error) {
@@ -804,7 +896,7 @@ async function findWorkingServer() {
     }
     
     // If no server is working, throw an error
-    throw new Error('No servers are currently available. Please check if any server is running on ports 3000-3004.');
+    throw new Error('No servers are currently available. Please check server status or try again later.');
 }
 
 // Smart server selection: try cached server first, then sequential search
@@ -836,6 +928,175 @@ async function getWorkingServerUrl() {
     const newServerUrl = await findWorkingServer();
     console.log('Found working server:', newServerUrl);
     return newServerUrl;
+}
+
+// Enhanced statistics function that gets UNIQUE data across servers (not multiplied)
+async function getAggregatedServerStats() {
+    const baseUrls = window.SERVER_CONFIG ? window.SERVER_CONFIG.getBaseUrls() : [];
+    console.log('Getting stats from servers:', baseUrls);
+    
+    const aggregatedStats = {
+        totalApiKeys: 0,
+        activeApiKeys: 0,
+        donatedApiKeys: 0,
+        totalAllocations: 0,
+        totalApiCalls: 0,
+        totalSuccessfulRequests: 0,
+        servers: [],
+        onlineServers: 0,
+        averageResponseTime: 0,
+        successRate: 0
+    };
+    
+    // Check if we have authentication
+    if (!authToken) {
+        console.warn('No auth token available for admin statistics');
+        throw new Error('Authentication required for admin statistics. Please log in first.');
+    }
+    
+    // Collect stats from all servers
+    const serverProms = baseUrls.map(async (baseUrl, index) => {
+        try {
+            console.log(`Fetching stats from server ${index + 1}: ${baseUrl}`);
+            const response = await fetch(`${baseUrl}/api/admin/stats`, {
+                method: 'GET',
+                headers: {
+                    ...getAuthHeaders(),
+                    'Accept': 'application/json'
+                },
+                timeout: 10000 // 10 second timeout
+            });
+            
+            if (response.ok) {
+                const stats = await response.json();
+                console.log(`Raw stats from ${baseUrl}:`, stats);
+                console.log(`Stats type:`, typeof stats);
+                console.log(`Stats keys:`, Object.keys(stats));
+                
+                // Map common field variations to our expected format
+                const normalizedStats = {
+                    totalApiKeys: stats.totalApiKeys || stats.apiKeysCount || stats.totalKeys || 0,
+                    activeApiKeys: stats.activeApiKeys || stats.activeKeys || 0,
+                    donatedApiKeys: stats.donatedApiKeys || stats.donatedKeys || 0,
+                    totalAllocations: stats.totalAllocations || stats.allocations || stats.userAllocations || 0,
+                    totalApiCalls: stats.totalApiCalls || stats.apiCalls || stats.requests || 0,
+                    totalSuccessfulRequests: stats.totalSuccessfulRequests || stats.successfulRequests || stats.successfulCalls || 0,
+                    averageResponseTime: stats.averageResponseTime || stats.avgResponseTime || stats.responseTime || 0,
+                    adminKeysCount: stats.adminKeysCount || stats.adminKeys || 0,
+                    donatedKeysCount: stats.donatedKeysCount || stats.donatedKeys || 0
+                };
+                
+                console.log(`Normalized stats for ${baseUrl}:`, normalizedStats);
+                
+                return {
+                    index: index + 1,
+                    url: baseUrl,
+                    identifier: baseUrl.includes('localhost') ? 
+                        `Port ${baseUrl.split(':')[2]}` : 
+                        baseUrl.replace('https://', '').replace('http://', ''),
+                    status: 'online',
+                    stats: normalizedStats,
+                    rawStats: stats
+                };
+            } else if (response.status === 401) {
+                console.warn(`Authentication failed for ${baseUrl}`);
+                return null;
+            } else {
+                console.warn(`Server ${baseUrl} returned status:`, response.status);
+                return null;
+            }
+        } catch (error) {
+            console.warn(`Failed to get stats from ${baseUrl}:`, error.message);
+            return null;
+        }
+    });
+    
+    const serverResults = await Prom.all(serverProms);
+    console.log('All server results:', serverResults);
+    
+    // Get the first working server's stats as the base (since API keys are shared across servers)
+    const workingServers = serverResults.filter(result => result && result.stats);
+    
+    if (workingServers.length > 0) {
+        // Use stats from first server since API keys are shared across all servers
+        const firstServer = workingServers[0];
+        const baseStats = firstServer.stats;
+        console.log(`Using base stats from ${firstServer.identifier}:`, baseStats);
+        
+        // API keys are shared across servers, so don't multiply
+        aggregatedStats.totalApiKeys = baseStats.totalApiKeys || 0;
+        aggregatedStats.activeApiKeys = baseStats.activeApiKeys || 0;
+        aggregatedStats.donatedApiKeys = baseStats.donatedApiKeys || 0;
+        
+        // Sum the usage stats (allocations, calls) from all working servers
+        workingServers.forEach(result => {
+            if (result && result.stats) {
+                const serverStats = result.stats;
+                aggregatedStats.totalAllocations += serverStats.totalAllocations || 0;
+                aggregatedStats.totalApiCalls += serverStats.totalApiCalls || 0;
+                aggregatedStats.totalSuccessfulRequests += serverStats.totalSuccessfulRequests || 0;
+                aggregatedStats.onlineServers++;
+                
+                aggregatedStats.servers.push({
+                    identifier: result.identifier,
+                    url: result.url,
+                    stats: result.stats,
+                    status: result.status
+                });
+            }
+        });
+        
+        // Calculate derived metrics
+        aggregatedStats.successRate = aggregatedStats.totalApiCalls > 0 ? 
+            ((aggregatedStats.totalSuccessfulRequests / aggregatedStats.totalApiCalls) * 100).toFixed(1) : '0';
+        
+        // Calculate average response time across servers
+        const responseTimes = workingServers
+            .map(server => server.stats.averageResponseTime)
+            .filter(time => time !== undefined && time !== null && time > 0);
+        
+        aggregatedStats.averageResponseTime = responseTimes.length > 0 ?
+            responseTimes.reduce((sum, time) => sum + time, 0) / responseTimes.length : 0;
+            
+    } else {
+        console.warn('No working servers found for statistics');
+        // If no servers are working, we might still want to show the interface
+        // with zeros or use cached/mock data for testing
+    }
+    
+    console.log('Final aggregated stats:', aggregatedStats);
+    return aggregatedStats;
+}
+
+// Helper function to validate and enhance server data
+function validateServerData(server, index) {
+    const validatedServer = {
+        identifier: server.identifier || `Server ${index + 1}`,
+        url: server.url || 'Unknown',
+        status: server.status || 'unknown',
+        stats: {
+            totalApiKeys: 0,
+            activeApiKeys: 0,
+            donatedApiKeys: 0,
+            adminKeysCount: 0,
+            donatedKeysCount: 0,
+            totalAllocations: 0,
+            totalApiCalls: 0,
+            totalSuccessfulRequests: 0,
+            averageResponseTime: 0,
+            ...server.stats
+        }
+    };
+    
+    // Ensure all numeric values are actually numbers
+    Object.keys(validatedServer.stats).forEach(key => {
+        const value = validatedServer.stats[key];
+        if (typeof value !== 'number' || isNaN(value)) {
+            validatedServer.stats[key] = 0;
+        }
+    });
+    
+    return validatedServer;
 }
 
 // Enhanced fetch function that automatically finds working server
@@ -888,31 +1149,268 @@ function showAlert(message, type) {
 // Server Usage Functions
 async function refreshServerUsage() {
     try {
-        const serverUrl = await getWorkingServerUrl();
-        console.log('Server Usage - Using server URL:', serverUrl);
-        const response = await fetch(`${serverUrl}/api/admin/server-usage`, {
-            headers: { 'Authorization': `Bearer ${authToken}` }
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            updateServerUsageOverview(data.totalStats);
-            displayServerUsageList(data.servers);
-            showAlert('Server usage data refreshed successfully', 'success');
-        } else {
-            console.error('Server usage response error:', response.status, response.statusText);
-            throw new Error('Failed to load server usage data');
+        // Check authentication first
+        if (!authToken) {
+            showAlert('Please log in to view server usage statistics', 'error');
+            return;
         }
+        
+        console.log('Refreshing server usage from all available servers...');
+        console.log('Auth token present:', !!authToken);
+        
+        // Show loading state
+        document.getElementById('totalServerAllocations').textContent = 'Loading...';
+        document.getElementById('totalServerApiCalls').textContent = 'Loading...';
+        document.getElementById('avgResponseTime').textContent = 'Loading...';
+        document.getElementById('successRate').textContent = 'Loading...';
+        
+        // Get aggregated statistics from all servers
+        const aggregatedStats = await getAggregatedServerStats();
+        console.log('Aggregated stats received:', aggregatedStats);
+        
+        // Update overview with aggregated data
+        updateServerUsageOverview(aggregatedStats);
+        
+        // Display individual server usage with enhanced error handling
+        if (aggregatedStats.servers && aggregatedStats.servers.length > 0) {
+            console.log('Displaying server list with', aggregatedStats.servers.length, 'servers');
+            displayServerUsageList(aggregatedStats.servers);
+        } else {
+            // If no server data, show a message
+            const container = document.getElementById('serverUsageList');
+            container.innerHTML = `
+                <div class="no-data">
+                    <p>No individual server data available.</p>
+                    <p><small>This might be due to:</small></p>
+                    <ul style="text-align: left; margin: 10px 0;">
+                        <li>Authentication issues</li>
+                        <li>Servers not responding to admin endpoints</li>
+                        <li>Missing server statistics data</li>
+                    </ul>
+                    <button class="btn btn-primary" onclick="refreshServerUsage()">🔄 Try Again</button>
+                    <button class="btn btn-info" onclick="testServerConnection()">🧪 Test Connection</button>
+                </div>
+            `;
+        }
+        
+        showAlert(`Server usage data refreshed from ${aggregatedStats.onlineServers} server(s)`, 'success');
     } catch (error) {
         console.error('Server usage refresh error:', error);
-        showAlert('Failed to refresh server usage data', 'error');
+        
+        // Reset loading states to show error
+        document.getElementById('totalServerAllocations').textContent = 'Error';
+        document.getElementById('totalServerApiCalls').textContent = 'Error';
+        document.getElementById('avgResponseTime').textContent = 'Error';
+        document.getElementById('successRate').textContent = 'Error';
+        
+        if (error.message.includes('Authentication required')) {
+            showAlert('Authentication required. Please log in to view server usage statistics.', 'error');
+        } else {
+            showAlert('Failed to refresh server usage data: ' + error.message, 'error');
+        }
     }
 }
 
+// Debug function to test server connection
+async function testServerConnection() {
+    try {
+        console.log('Testing server connections...');
+        const baseUrls = window.SERVER_CONFIG ? window.SERVER_CONFIG.getBaseUrls() : [];
+        console.log('Testing URLs:', baseUrls);
+        
+        const results = [];
+        
+        for (const baseUrl of baseUrls) {
+            try {
+                console.log(`Testing ${baseUrl}...`);
+                
+                // Test health endpoint
+                const healthResponse = await fetch(`${baseUrl}/api/health`);
+                console.log(`Health check for ${baseUrl}:`, healthResponse.status);
+                
+                // Test admin stats endpoint
+                const statsResponse = await fetch(`${baseUrl}/api/admin/stats`, {
+                    headers: getAuthHeaders()
+                });
+                console.log(`Stats check for ${baseUrl}:`, statsResponse.status);
+                
+                let statsData = null;
+                if (statsResponse.ok) {
+                    statsData = await statsResponse.json();
+                    console.log(`Stats data from ${baseUrl}:`, statsData);
+                }
+                
+                results.push({
+                    url: baseUrl,
+                    health: healthResponse.status,
+                    stats: statsResponse.status,
+                    data: statsData
+                });
+                
+            } catch (err) {
+                console.error(`Error testing ${baseUrl}:`, err);
+                results.push({
+                    url: baseUrl,
+                    health: 'Error',
+                    stats: 'Error',
+                    error: err.message
+                });
+            }
+        }
+        
+        // Display results in a popup or alert
+        const resultText = results.map(r => 
+            `${r.url}: Health=${r.health}, Stats=${r.stats}${r.error ? `, Error=${r.error}` : ''}`
+        ).join('\n');
+        
+        alert('Connection Test Results:\n\n' + resultText);
+        console.log('Full test results:', results);
+        
+        showAlert('Server connection test completed. Check console for details.', 'info');
+    } catch (error) {
+        console.error('Test connection error:', error);
+        showAlert('Failed to test server connections', 'error');
+    }
+}
+
+// Function to show raw statistics data for debugging
+async function showRawStats() {
+    try {
+        const baseUrls = window.SERVER_CONFIG ? window.SERVER_CONFIG.getBaseUrls() : [];
+        console.log('Fetching raw stats from all servers...');
+        
+        const allResults = [];
+        
+        for (const baseUrl of baseUrls) {
+            try {
+                const response = await fetch(`${baseUrl}/api/admin/stats`, {
+                    headers: getAuthHeaders()
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log(`Raw stats from ${baseUrl}:`, data);
+                    console.log(`Data keys:`, Object.keys(data));
+                    console.log(`Data values:`, Object.values(data));
+                    
+                    allResults.push({
+                        server: baseUrl,
+                        status: 'success',
+                        data: data,
+                        keys: Object.keys(data)
+                    });
+                } else {
+                    console.log(`Failed to get stats from ${baseUrl}:`, response.status);
+                    allResults.push({
+                        server: baseUrl,
+                        status: 'error',
+                        error: `HTTP ${response.status}`
+                    });
+                }
+            } catch (error) {
+                console.error(`Error getting stats from ${baseUrl}:`, error);
+                allResults.push({
+                    server: baseUrl,
+                    status: 'error',
+                    error: error.message
+                });
+            }
+        }
+        
+        // Create a detailed report
+        const report = allResults.map(result => {
+            if (result.status === 'success') {
+                return `✅ ${result.server}:\n  Fields: ${result.keys.join(', ')}\n  Data: ${JSON.stringify(result.data, null, 2)}`;
+            } else {
+                return `❌ ${result.server}: ${result.error}`;
+            }
+        }).join('\n\n');
+        
+        // Show in alert and console
+        alert('Raw Statistics Report:\n\n' + report);
+        console.log('Complete raw stats results:', allResults);
+        
+        showAlert('Raw statistics logged to console', 'info');
+    } catch (error) {
+        console.error('Error showing raw stats:', error);
+        showAlert('Failed to show raw statistics', 'error');
+    }
+}
+
+// Function to test display with mock data
+async function testMockData() {
+    console.log('Testing display with mock data...');
+    
+    const mockStats = {
+        totalApiKeys: 4,
+        activeApiKeys: 4,
+        donatedApiKeys: 0,
+        totalAllocations: 25,
+        totalApiCalls: 150,
+        totalSuccessfulRequests: 142,
+        onlineServers: 5,
+        averageResponseTime: 350,
+        successRate: '94.7',
+        servers: [
+            {
+                identifier: 'moonlight-api.onrender.com',
+                url: 'https://moonlight-api.onrender.com',
+                status: 'online',
+                stats: {
+                    totalApiKeys: 4,
+                    activeApiKeys: 4,
+                    donatedApiKeys: 0,
+                    totalAllocations: 5,
+                    totalApiCalls: 30,
+                    totalSuccessfulRequests: 28,
+                    averageResponseTime: 320,
+                    adminKeysCount: 4,
+                    donatedKeysCount: 0
+                }
+            },
+            {
+                identifier: 'stardust-server.onrender.com',
+                url: 'https://stardust-server.onrender.com',
+                status: 'online',
+                stats: {
+                    totalApiKeys: 4,
+                    activeApiKeys: 4,
+                    donatedApiKeys: 0,
+                    totalAllocations: 5,
+                    totalApiCalls: 30,
+                    totalSuccessfulRequests: 29,
+                    averageResponseTime: 380,
+                    adminKeysCount: 4,
+                    donatedKeysCount: 0
+                }
+            }
+        ]
+    };
+    
+    console.log('Mock data:', mockStats);
+    
+    // Test overview display
+    updateServerUsageOverview(mockStats);
+    
+    // Test individual server display
+    displayServerUsageList(mockStats.servers);
+    
+    showAlert('Mock data test completed - check if statistics display correctly', 'info');
+}
+
 function updateServerUsageOverview(stats) {
-    document.getElementById('totalServerAllocations').textContent = stats.totalAllocations.toLocaleString();
-    document.getElementById('totalServerApiCalls').textContent = stats.totalApiCalls.toLocaleString();
-    document.getElementById('avgResponseTime').textContent = Math.round(stats.averageResponseTime);
+    console.log('updateServerUsageOverview called with:', stats);
+    console.log('Stats keys:', Object.keys(stats));
+    
+    // Debug each field
+    console.log('totalAllocations:', stats.totalAllocations);
+    console.log('totalApiCalls:', stats.totalApiCalls);
+    console.log('averageResponseTime:', stats.averageResponseTime);
+    console.log('totalSuccessfulRequests:', stats.totalSuccessfulRequests);
+    
+    document.getElementById('totalServerAllocations').textContent = (stats.totalAllocations || 0).toLocaleString();
+    document.getElementById('totalServerApiCalls').textContent = (stats.totalApiCalls || 0).toLocaleString();
+    document.getElementById('avgResponseTime').textContent = Math.round(stats.averageResponseTime || 0);
     
     const successRate = stats.totalApiCalls > 0 ? 
         ((stats.totalSuccessfulRequests / stats.totalApiCalls) * 100).toFixed(1) : '0';
@@ -927,18 +1425,36 @@ function displayServerUsageList(servers) {
         return;
     }
 
-    const serversHtml = servers.map(server => {
-        const port = server.serverUrl.match(/:(\d+)/)?.[1] || 'Unknown';
-        const responseTime = server.averageResponseTime || 0;
-        const healthClass = getHealthIndicatorClass(responseTime, server.isOnline);
-        const healthText = getHealthText(responseTime, server.isOnline);
-        const successRate = server.totalApiCalls > 0 ? 
-            ((server.successfulRequests / server.totalApiCalls) * 100).toFixed(1) : '0';
+    // Validate and enhance server data
+    const validatedServers = servers.map((server, index) => validateServerData(server, index));
+
+    const serversHtml = validatedServers.map((server, index) => {
+        // Extract server identifier (domain for production, port for localhost)
+        let serverIdentifier = server.identifier;
+        if (server.url && server.url !== 'Unknown') {
+            if (server.url.includes('localhost')) {
+                const port = server.url.match(/:(\d+)/)?.[1] || 'Unknown';
+                serverIdentifier = `Port ${port}`;
+            } else {
+                // For production URLs, extract domain name
+                const domain = server.url.replace('https://', '').replace('http://', '').split('/')[0];
+                serverIdentifier = domain;
+            }
+        }
+        
+        // Extract statistics from nested stats object
+        const stats = server.stats;
+        const responseTime = stats.averageResponseTime || 0;
+        const isOnline = server.status === 'online';
+        const healthClass = getHealthIndicatorClass(responseTime, isOnline);
+        const healthText = getHealthText(responseTime, isOnline);
+        const successRate = stats.totalApiCalls > 0 ? 
+            ((stats.totalSuccessfulRequests / stats.totalApiCalls) * 100).toFixed(1) : '0';
 
         return `
             <div class="server-usage-card">
                 <div class="server-usage-header">
-                    <div class="server-port">Port ${port}</div>
+                    <div class="server-port">${serverIdentifier}</div>
                     <div class="server-health">
                         <div class="health-indicator ${healthClass}"></div>
                         <span>${healthText}</span>
@@ -947,11 +1463,11 @@ function displayServerUsageList(servers) {
                 
                 <div class="server-metrics">
                     <div class="metric-item">
-                        <div class="metric-value">${server.totalAllocations.toLocaleString()}</div>
+                        <div class="metric-value">${stats.totalAllocations.toLocaleString()}</div>
                         <div class="metric-label">Allocations</div>
                     </div>
                     <div class="metric-item">
-                        <div class="metric-value">${server.totalApiCalls.toLocaleString()}</div>
+                        <div class="metric-value">${stats.totalApiCalls.toLocaleString()}</div>
                         <div class="metric-label">API Calls</div>
                     </div>
                     <div class="metric-item">
@@ -966,17 +1482,21 @@ function displayServerUsageList(servers) {
 
                 <div style="margin-top: 15px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                        <span style="font-size: 0.9rem; color: #6b7280;">Load Distribution</span>
-                        <span style="font-size: 0.8rem; color: #6b7280;">${server.totalLoadHandled || 0}% of total</span>
+                        <span style="font-size: 0.9rem; color: #6b7280;">Server Info</span>
+                        <span style="font-size: 0.8rem; color: #6b7280;">Status: ${isOnline ? '🟢 Online' : '🔴 Offline'}</span>
                     </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${Math.min(server.totalLoadHandled || 0, 100)}%"></div>
+                    <div style="background: #f3f4f6; padding: 8px; border-radius: 4px; font-size: 0.85rem;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                            <span>Admin Keys: ${stats.adminKeysCount}</span>
+                            <span>Donated Keys: ${stats.donatedKeysCount}</span>
+                            <span>Total Keys: ${stats.totalApiKeys}</span>
+                            <span>Active Keys: ${stats.activeApiKeys}</span>
+                        </div>
                     </div>
                 </div>
 
-                <div style="margin-top: 15px; display: flex; justify-content: space-between; font-size: 0.8rem; color: #6b7280;">
-                    <span>Last Activity: ${formatLastActivity(server.lastActivity)}</span>
-                    <span>Status: ${server.isOnline ? '🟢 Online' : '🔴 Offline'}</span>
+                <div style="margin-top: 15px; font-size: 0.8rem; color: #6b7280; text-align: center;">
+                    <strong>Server URL:</strong> ${server.url}
                 </div>
             </div>
         `;
@@ -1113,23 +1633,50 @@ function renderHourlyChart(hourlyData) {
 }
 
 async function resetServerStats() {
-    if (!confirm('Are you sure you want to reset all server statistics? This action cannot be undone.')) {
+    if (!confirm('Are you sure you want to reset all server statistics across all servers? This action cannot be undone.')) {
         return;
     }
     
     try {
-        const serverUrl = await getWorkingServerUrl();
-        const response = await fetch(`${serverUrl}/api/admin/reset-server-stats`, {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${authToken}` }
+        const baseUrls = window.SERVER_CONFIG ? window.SERVER_CONFIG.getBaseUrls() : [];
+        let successCount = 0;
+        let totalServers = 0;
+        
+        // Reset stats on all available servers
+        const resetProms = baseUrls.map(async (baseUrl) => {
+            try {
+                const response = await fetch(`${baseUrl}/api/admin/reset-server-stats`, {
+                    method: 'POST',
+                    headers: { 
+                        'Authorization': `Bearer ${authToken}`,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                totalServers++;
+                if (response.ok) {
+                    successCount++;
+                    return { success: true, url: baseUrl };
+                } else {
+                    console.warn(`Failed to reset stats on ${baseUrl}: ${response.status}`);
+                    return { success: false, url: baseUrl, error: response.status };
+                }
+            } catch (error) {
+                totalServers++;
+                console.warn(`Failed to reset stats on ${baseUrl}:`, error.message);
+                return { success: false, url: baseUrl, error: error.message };
+            }
         });
 
-        if (response.ok) {
-            showAlert('Server statistics reset successfully', 'success');
+        await Prom.all(resetProms);
+        
+        if (successCount > 0) {
+            showAlert(`Server statistics reset successfully on ${successCount}/${totalServers} server(s)`, 'success');
             refreshServerUsage();
             loadServerAnalytics();
         } else {
-            throw new Error('Failed to reset server statistics');
+            throw new Error('Failed to reset statistics on any server');
         }
     } catch (error) {
         console.error('Reset server stats error:', error);
@@ -1137,13 +1684,259 @@ async function resetServerStats() {
     }
 }
 
+// ============================================================================
+// INTEGRATED TESTING FUNCTIONS
+// ============================================================================
+
+async function testServerHealth() {
+    const resultsDiv = document.getElementById('diagnosticsResults');
+    resultsDiv.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">🔄 Testing server health...</div>';
+    
+    const baseUrls = window.SERVER_CONFIG ? window.SERVER_CONFIG.getBaseUrls() : [];
+    
+    try {
+        const proms = baseUrls.map(async (baseUrl, index) => {
+            const startTime = Date.now();
+            try {
+                const response = await fetch(`${baseUrl}/api/health`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const responseTime = Date.now() - startTime;
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    return {
+                        index: index + 1,
+                        url: baseUrl,
+                        identifier: baseUrl.includes('localhost') ? 
+                            `Port ${baseUrl.split(':')[2]}` : 
+                            baseUrl.replace('https://', '').replace('http://', ''),
+                        status: 'online',
+                        responseTime,
+                        data
+                    };
+                } else {
+                    return {
+                        index: index + 1,
+                        url: baseUrl,
+                        identifier: baseUrl.includes('localhost') ? 
+                            `Port ${baseUrl.split(':')[2]}` : 
+                            baseUrl.replace('https://', '').replace('http://', ''),
+                        status: 'offline',
+                        responseTime,
+                        error: `HTTP ${response.status}`
+                    };
+                }
+            } catch (error) {
+                const responseTime = Date.now() - startTime;
+                return {
+                    index: index + 1,
+                    url: baseUrl,
+                    identifier: baseUrl.includes('localhost') ? 
+                        `Port ${baseUrl.split(':')[2]}` : 
+                        baseUrl.replace('https://', '').replace('http://', ''),
+                    status: 'offline',
+                    responseTime,
+                    error: error.message
+                };
+            }
+        });
+        
+        const results = await Prom.all(proms);
+        const onlineCount = results.filter(r => r.status === 'online').length;
+        
+        let html = '<h4>❤️ Health Test Results</h4>';
+        html += `<div style="margin: 10px 0; padding: 10px; background: ${onlineCount > 0 ? '#d4edda' : '#f8d7da'}; border-radius: 4px; color: ${onlineCount > 0 ? '#155724' : '#721c24'};">`;
+        html += `<strong>Summary:</strong> ${onlineCount}/${results.length} servers healthy</div>`;
+        
+        results.forEach(result => {
+            const statusClass = result.status === 'online' ? '#d4edda' : '#f8d7da';
+            const statusColor = result.status === 'online' ? '#155724' : '#721c24';
+            
+            html += `
+                <div style="margin: 10px 0; padding: 12px; background: ${statusClass}; border-radius: 4px; color: ${statusColor};">
+                    <strong>${result.identifier}</strong> - ${result.status.toUpperCase()} (${result.responseTime}ms)
+                    ${result.data ? `
+                        <br><small>Database: ${result.data.database} | Uptime: ${Math.floor(result.data.uptime)}s | Keys: ${result.data.adminKeysCount || 0}</small>
+                    ` : ''}
+                    ${result.error ? `<br><small>Error: ${result.error}</small>` : ''}
+                </div>
+            `;
+        });
+        
+        resultsDiv.innerHTML = html;
+        showAlert(`Health test completed: ${onlineCount}/${results.length} servers healthy`, onlineCount > 0 ? 'success' : 'error');
+    } catch (error) {
+        resultsDiv.innerHTML = `<div style="color: #dc3545; padding: 15px;">❌ Health test failed: ${error.message}</div>`;
+        showAlert('Health test failed', 'error');
+    }
+}
+
+async function testAdminEndpoints() {
+    const resultsDiv = document.getElementById('diagnosticsResults');
+    resultsDiv.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">🔐 Testing admin endpoint security...</div>';
+    
+    const baseUrls = window.SERVER_CONFIG ? window.SERVER_CONFIG.getBaseUrls() : [];
+    
+    try {
+        const proms = baseUrls.map(async (baseUrl, index) => {
+            try {
+                const response = await fetch(`${baseUrl}/api/admin/stats`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                return {
+                    index: index + 1,
+                    url: baseUrl,
+                    identifier: baseUrl.includes('localhost') ? 
+                        `Port ${baseUrl.split(':')[2]}` : 
+                        baseUrl.replace('https://', '').replace('http://', ''),
+                    status: response.status,
+                    statusText: response.statusText,
+                    requiresAuth: response.status === 401,
+                    accessible: response.ok
+                };
+            } catch (error) {
+                return {
+                    index: index + 1,
+                    url: baseUrl,
+                    identifier: baseUrl.includes('localhost') ? 
+                        `Port ${baseUrl.split(':')[2]}` : 
+                        baseUrl.replace('https://', '').replace('http://', ''),
+                    status: 'error',
+                    error: error.message
+                };
+            }
+        });
+        
+        const results = await Prom.all(proms);
+        const securedCount = results.filter(r => r.requiresAuth).length;
+        const accessibleCount = results.filter(r => r.accessible).length;
+        
+        let html = '<h4>🔐 Security Test Results</h4>';
+        html += '<p style="color: #666; margin: 10px 0;">Testing admin endpoints without authentication (should return 401 Unauthorized):</p>';
+        
+        if (accessibleCount > 0) {
+            html += `<div style="margin: 10px 0; padding: 10px; background: #f8d7da; border-radius: 4px; color: #721c24;">`;
+            html += `<strong>⚠️ SECURITY ALERT:</strong> ${accessibleCount} admin endpoint(s) accessible without authentication!</div>`;
+        }
+        
+        html += `<div style="margin: 10px 0; padding: 10px; background: ${securedCount === results.length ? '#d4edda' : '#f8d7da'}; border-radius: 4px; color: ${securedCount === results.length ? '#155724' : '#721c24'};">`;
+        html += `<strong>Security Summary:</strong> ${securedCount}/${results.length} admin endpoints properly secured</div>`;
+        
+        results.forEach(result => {
+            const isSecure = result.requiresAuth && !result.accessible;
+            const statusClass = isSecure ? '#d4edda' : '#f8d7da';
+            const statusColor = isSecure ? '#155724' : '#721c24';
+            const statusText = isSecure ? 'PROPERLY SECURED' : 'SECURITY ISSUE';
+            
+            html += `
+                <div style="margin: 10px 0; padding: 12px; background: ${statusClass}; border-radius: 4px; color: ${statusColor};">
+                    <strong>${result.identifier}</strong> - ${statusText}
+                    <br><small>Response: ${result.status} ${result.statusText || ''}</small>
+                    ${isSecure ? 
+                        '<br><small>✅ Endpoint properly requires authentication</small>' : 
+                        '<br><small>⚠️ Admin endpoint may be unsecured</small>'
+                    }
+                    ${result.error ? `<br><small>Connection Error: ${result.error}</small>` : ''}
+                </div>
+            `;
+        });
+        
+        resultsDiv.innerHTML = html;
+        showAlert(`Security test completed: ${securedCount}/${results.length} endpoints secured`, securedCount === results.length ? 'success' : 'error');
+    } catch (error) {
+        resultsDiv.innerHTML = `<div style="color: #dc3545; padding: 15px;">❌ Security test failed: ${error.message}</div>`;
+        showAlert('Security test failed', 'error');
+    }
+}
+
+async function testAggregatedStats() {
+    const resultsDiv = document.getElementById('diagnosticsResults');
+    resultsDiv.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">📊 Testing aggregated statistics...</div>';
+    
+    try {
+        if (!authToken) {
+            resultsDiv.innerHTML = `
+                <div style="color: #856404; background: #fff3cd; padding: 15px; border-radius: 4px;">
+                    <strong>⚠️ Authentication Required</strong><br>
+                    Please log in to test admin statistics functionality.
+                </div>
+            `;
+            showAlert('Authentication required for stats test', 'warning');
+            return;
+        }
+        
+        const aggregatedStats = await getAggregatedServerStats();
+        
+        let html = '<h4>📊 Aggregated Statistics Test</h4>';
+        html += `<div style="margin: 10px 0; padding: 10px; background: #d4edda; border-radius: 4px; color: #155724;">`;
+        html += `<strong>✅ Success:</strong> Aggregated data from ${aggregatedStats.onlineServers} server(s)</div>`;
+        
+        // Statistics overview
+        html += `
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 15px 0;">
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; text-align: center;">
+                    <div style="font-size: 24px; font-weight: bold; color: #007bff;">${aggregatedStats.totalApiKeys}</div>
+                    <div style="font-size: 14px; color: #666;">Total API Keys</div>
+                </div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; text-align: center;">
+                    <div style="font-size: 24px; font-weight: bold; color: #28a745;">${aggregatedStats.activeApiKeys}</div>
+                    <div style="font-size: 14px; color: #666;">Active Keys</div>
+                </div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; text-align: center;">
+                    <div style="font-size: 24px; font-weight: bold; color: #17a2b8;">${aggregatedStats.donatedApiKeys}</div>
+                    <div style="font-size: 14px; color: #666;">Donated Keys</div>
+                </div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; text-align: center;">
+                    <div style="font-size: 24px; font-weight: bold; color: #ffc107;">${aggregatedStats.onlineServers}/${aggregatedStats.servers.length}</div>
+                    <div style="font-size: 14px; color: #666;">Online Servers</div>
+                </div>
+            </div>
+        `;
+        
+        // Individual server contributions
+        html += '<h5>📈 Server Contributions:</h5>';
+        aggregatedStats.servers.forEach(server => {
+            if (server.stats) {
+                html += `
+                    <div style="margin: 8px 0; padding: 10px; background: #e3f2fd; border-radius: 4px;">
+                        <strong>${server.identifier}</strong>: 
+                        ${server.stats.totalApiKeys || 0} keys, 
+                        ${(server.stats.totalApiCalls || 0).toLocaleString()} calls
+                    </div>
+                `;
+            }
+        });
+        
+        resultsDiv.innerHTML = html;
+        showAlert('Statistics aggregation test completed successfully', 'success');
+    } catch (error) {
+        let html = '<h4>📊 Aggregated Statistics Test</h4>';
+        html += `<div style="color: #dc3545; background: #f8d7da; padding: 15px; border-radius: 4px;">`;
+        html += `<strong>❌ Failed:</strong> ${error.message}</div>`;
+        
+        if (error.message.includes('Authentication required')) {
+            html += `<div style="margin-top: 10px; padding: 10px; background: #fff3cd; border-radius: 4px; color: #856404;">`;
+            html += `<strong>💡 Tip:</strong> Make sure you're logged in as an admin to access statistics.</div>`;
+        }
+        
+        resultsDiv.innerHTML = html;
+        showAlert('Statistics test failed', 'error');
+    }
+}
+
 // Initialize dashboard
 document.addEventListener('DOMContentLoaded', async function() {
-    // Clear cached server URL to force fresh discovery (temporary debug)
-    localStorage.removeItem('workingServerUrl');
-    workingServerUrl = null;
-    console.log('Cleared cached server URL for fresh discovery');
-    
     // Check if user is already authenticated
     const isAuthenticated = await checkAuthentication();
     

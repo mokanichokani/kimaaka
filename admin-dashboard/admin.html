@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kimaaka Admin Dashboard</title>
+    <title>API Admin Dashboard</title>
     <style>
         * {
             margin: 0;
@@ -578,6 +578,82 @@
             font-style: italic;
             padding: 40px;
         }
+
+        /* Testing & Diagnostics Styles */
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #117a8b;
+        }
+
+        #diagnosticsResults {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #e5e7eb;
+        }
+
+        .test-result-card {
+            margin: 10px 0;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 4px solid #ddd;
+        }
+
+        .test-result-success {
+            background: #d4edda;
+            border-left-color: #28a745;
+            color: #155724;
+        }
+
+        .test-result-error {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+            color: #721c24;
+        }
+
+        .test-result-warning {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+            color: #856404;
+        }
+
+        .stats-overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .mini-stat-card {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+
+        .mini-stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .mini-stat-label {
+            font-size: 12px;
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -585,7 +661,7 @@
     <div id="loginContainer" class="login-container">
         <div class="login-box">
             <div class="login-header">
-                <h1>🚀 Kimaaka Admin</h1>
+                <h1>🚀 API Admin</h1>
                 <p>Admin Dashboard Login</p>
             </div>
             <div id="loginError" class="login-error hidden"></div>
@@ -601,7 +677,7 @@
     <div id="dashboardContainer" class="dashboard-container">
         <div class="container">
             <div class="header">
-                <h1>🚀 Kimaaka Admin Dashboard</h1>
+                <h1>🚀 API Admin Dashboard</h1>
                 <p>Manage API Keys & Monitor Servers
                     <button class="logout-btn" onclick="logout()">Logout</button>
                 </p>
@@ -611,7 +687,6 @@
                 <button class="nav-tab active" onclick="showTab('overview')">📊 Overview</button>
                 <button class="nav-tab" onclick="showTab('api-keys')">🔑 API Keys</button>
                 <button class="nav-tab" onclick="showTab('servers')">🖥️ Servers</button>
-                <button class="nav-tab" onclick="showTab('server-usage')">📈 Server Usage</button>
                 <button class="nav-tab" onclick="showTab('users')">👥 Users</button>
                 <button class="nav-tab" onclick="showTab('settings')">⚙️ Settings</button>
             </div>
@@ -702,68 +777,22 @@
         <!-- Servers Tab -->
         <div id="servers" class="tab-content">
             <div class="section">
-                <h3>🖥️ Server Status</h3>
-                <button class="btn btn-primary" onclick="checkAllServers()">Refresh All Servers</button>
+                <h3>🖥️ Server Status & Testing</h3>
+                <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn btn-primary" onclick="checkAllServers()">🔄 Check All Servers</button>
+                    <button class="btn btn-secondary" onclick="testServerHealth()">❤️ Health Test</button>
+                    <button class="btn btn-warning" onclick="testAdminEndpoints()">🔐 Security Test</button>
+                    <button class="btn btn-info" onclick="testAggregatedStats()">📊 Stats Test</button>
+                </div>
                 <div class="server-grid" id="serversList">
                     <div class="loading">Checking server status...</div>
                 </div>
             </div>
-        </div>
-
-        <!-- Server Usage Tab -->
-        <div id="server-usage" class="tab-content">
+            
             <div class="section">
-                <h3>📊 Server Usage Overview</h3>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-number" id="totalServerAllocations">-</div>
-                        <div class="stat-label">Total Allocations</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="totalServerApiCalls">-</div>
-                        <div class="stat-label">Total API Calls</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="avgResponseTime">-</div>
-                        <div class="stat-label">Avg Response Time (ms)</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="successRate">-</div>
-                        <div class="stat-label">Success Rate (%)</div>
-                    </div>
-                </div>
-                <button class="btn btn-primary" onclick="refreshServerUsage()">🔄 Refresh Data</button>
-                <button class="btn btn-warning" onclick="resetServerStats()">🗑️ Reset Statistics</button>
-            </div>
-
-            <div class="section">
-                <h3>📈 Server Performance Analytics</h3>
-                <div style="margin-bottom: 20px;">
-                    <label for="analyticsRange">Time Range:</label>
-                    <select id="analyticsRange" style="margin-left: 10px; padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 6px;" onchange="loadServerAnalytics()">
-                        <option value="1">Last 24 Hours</option>
-                        <option value="3">Last 3 Days</option>
-                        <option value="7" selected>Last 7 Days</option>
-                        <option value="30">Last 30 Days</option>
-                    </select>
-                </div>
-                
-                <div class="server-analytics-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
-                    <div style="background: white; padding: 20px; border-radius: 10px; border: 1px solid #e5e7eb;">
-                        <h4 style="margin-bottom: 15px; color: #374151;">📊 Daily Trends</h4>
-                        <canvas id="dailyChart" width="400" height="200"></canvas>
-                    </div>
-                    <div style="background: white; padding: 20px; border-radius: 10px; border: 1px solid #e5e7eb;">
-                        <h4 style="margin-bottom: 15px; color: #374151;">⏱️ Hourly Activity</h4>
-                        <canvas id="hourlyChart" width="400" height="200"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <div class="section">
-                <h3>🖥️ Individual Server Statistics</h3>
-                <div id="serverUsageList">
-                    <div class="loading">Loading server usage data...</div>
+                <h3>🔍 Server Diagnostics</h3>
+                <div id="diagnosticsResults" style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-top: 10px;">
+                    <p style="color: #666; margin: 0;">Click any test button above to run diagnostics...</p>
                 </div>
             </div>
         </div>

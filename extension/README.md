@@ -1,4 +1,4 @@
-# 🎯 ISEkimaaka Chrome Extension
+# 🎯 kimaaka Chrome Extension
 
 **Version:** 3.0.0  
 **Type:** Chrome Extension (Manifest V3)  
@@ -6,7 +6,7 @@
 
 ## 🌟 Overview
 
-The ISEkimaaka Chrome Extension is the frontend component that captures screenshots, communicates with the backend server, and displays AI-generated answers as colored visual indicators on any webpage.
+The kimaaka Chrome Extension is the frontend component that captures screenshots, communicates with the backend server, and displays AI-generated answers as colored visual indicators on any webpage.
 
 ## ✨ Features
 
@@ -55,7 +55,7 @@ extension/
 1. **Clone Repository**
    ```bash
    git clone <repository-url>
-   cd ISEkimaaka/extension
+   cd kimaaka/extension
    ```
 
 2. **Load in Chrome**
@@ -66,7 +66,7 @@ extension/
    - Pin the extension to toolbar
 
 3. **Verify Installation**
-   - Look for ISEkimaaka icon in toolbar
+   - Look for kimaaka icon in toolbar
    - Test with `Cmd+Shift+Y` shortcut
    - Check popup shows server status
 

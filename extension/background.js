@@ -83,7 +83,7 @@ async function tryServersWithFailover(operation, maxRetries = SERVER_URLS.length
             // If this was the last available server, wait a bit before retrying
             if (availableServers.length === 1 && attempt < maxRetries) {
                 console.log('Waiting 2 seconds before trying again...');
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                await new Prom(resolve => setTimeout(resolve, 2000));
             }
         }
     }
@@ -170,7 +170,7 @@ async function getApiKeyFromServer() {
 }
 
 async function getCachedApiKey() {
-    const TWO_HOURS_MS = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
+    const TWO_HOURS_MS = 2 * 60 * 60 * 1000; // 2 hours in millconds
 
     try {
         // Get cached data from chrome storage
@@ -257,7 +257,7 @@ async function handleTriggerAnalysis(tab) {
     // Prevent the extension from trying to run on pages where it will fail,
     // like the Chrome Web Store, chrome:// pages, or blank new tabs.
     if (!tab || !tab.id || !tab.url || tab.url.startsWith("chrome://") || tab.url.startsWith("https://chrome.google.com")) {
-        console.log("isekimaaka cannot run on this protected page. Aborting.");
+        console.log("kimaaka cannot run on this protected page. Aborting.");
         return; 
     }
     const currentTabId = tab.id;
