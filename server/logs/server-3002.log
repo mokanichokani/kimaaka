@@ -1,0 +1,44 @@
+Environment check:
+Current directory: /Users/mokanichokani/Documents/mcCode/Kimaaka/Kimaaka-extension/ISEkimaaka/server
+MONGODB_URI exists: true
+JWT_SECRET exists: true
+MONGODB_URI starts with mongodb: true
+
+============================================================
+[2025-08-10T16:47:40.895Z] 🚀 Kimaaka Server Started Successfully!
+[2025-08-10T16:47:40.895Z] 🌐 Server running on port 3002
+[2025-08-10T16:47:40.895Z] 📊 Admin panel (via server): http://localhost:3002/admin/admin.html
+[2025-08-10T16:47:40.895Z] 📊 Admin panel (standalone): See admin-dashboard/README.md
+[2025-08-10T16:47:40.895Z] 🔑 API endpoint: http://localhost:3002/api/gemini-key
+[2025-08-10T16:47:40.895Z] 💝 Donation endpoint: http://localhost:3002/api/donate-key
+[2025-08-10T16:47:40.895Z] 📋 Health check: http://localhost:3002/api/health
+============================================================
+[2025-08-10T16:47:40.895Z] 👀 Monitoring all requests...
+
+[2025-08-10T16:47:41.057Z] 🔗 Mongoose connected to MongoDB
+[2025-08-10T16:47:41.058Z] 🗄️ Connected to MongoDB successfully
+📊 Resumed usage tracking for server: http://localhost:3002/api
+[2025-08-10T16:47:42.979Z] GET /api/health - IP: ::1
+[2025-08-10T16:47:42.979Z] Response: 200 GET /api/health
+[2025-08-10T16:47:48.547Z] GET /api/health - IP: ::1
+[2025-08-10T16:47:48.547Z] Response: 200 GET /api/health
+[2025-08-10T16:47:49.210Z] GET /api/health - IP: ::1
+[2025-08-10T16:47:49.210Z] Response: 200 GET /api/health
+[2025-08-10T16:48:19.458Z] GET /api/health - IP: ::1
+[2025-08-10T16:48:19.458Z] Response: 200 GET /api/health
+[2025-08-10T16:48:49.457Z] GET /api/health - IP: ::1
+[2025-08-10T16:48:49.457Z] Response: 200 GET /api/health
+[2025-08-10T16:49:19.454Z] GET /api/health - IP: ::1
+[2025-08-10T16:49:19.454Z] Response: 200 GET /api/health
+[2025-08-10T16:49:49.465Z] GET /api/health - IP: ::1
+[2025-08-10T16:49:49.465Z] Response: 200 GET /api/health
+[2025-08-10T16:50:19.458Z] GET /api/health - IP: ::1
+[2025-08-10T16:50:19.458Z] Response: 200 GET /api/health
+[2025-08-10T16:50:49.460Z] GET /api/health - IP: ::1
+[2025-08-10T16:50:49.460Z] Response: 200 GET /api/health
+[2025-08-10T16:51:48.473Z] GET /api/health - IP: ::1
+[2025-08-10T16:51:48.473Z] Response: 200 GET /api/health
+[2025-08-10T16:52:19.462Z] GET /api/health - IP: ::1
+[2025-08-10T16:52:19.462Z] Response: 200 GET /api/health
+[2025-08-10T16:52:49.462Z] GET /api/health - IP: ::1
+[2025-08-10T16:52:49.462Z] Response: 200 GET /api/health

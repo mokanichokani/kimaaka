@@ -109,7 +109,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     if (request.action === "show_gemini_loading") {
         console.log("CS: Handling 'show_gemini_loading'.");
-        showOnPageDisplay('. .', false, true); // CHANGED: Just "..." for loading
+        const loadingText = request.loadingText || '. .'; // Use provided loading text or default
+        showOnPageDisplay(loadingText, false, true);
         sendResponse({status: "loading_shown_on_page"});
     } else if (request.action === "show_gemini_result") {
         console.log("CS: Handling 'show_gemini_result'.");

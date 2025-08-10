@@ -1,0 +1,69 @@
+Environment check:
+Current directory: /Users/mokanichokani/Documents/mcCode/Kimaaka/Kimaaka-extension/ISEkimaaka/server
+MONGODB_URI exists: true
+JWT_SECRET exists: true
+MONGODB_URI starts with mongodb: true
+
+============================================================
+[2025-08-10T16:47:36.864Z] 🚀 Kimaaka Server Started Successfully!
+[2025-08-10T16:47:36.864Z] 🌐 Server running on port 3000
+[2025-08-10T16:47:36.864Z] 📊 Admin panel (via server): http://localhost:3000/admin/admin.html
+[2025-08-10T16:47:36.864Z] 📊 Admin panel (standalone): See admin-dashboard/README.md
+[2025-08-10T16:47:36.864Z] 🔑 API endpoint: http://localhost:3000/api/gemini-key
+[2025-08-10T16:47:36.864Z] 💝 Donation endpoint: http://localhost:3000/api/donate-key
+[2025-08-10T16:47:36.864Z] 📋 Health check: http://localhost:3000/api/health
+============================================================
+[2025-08-10T16:47:36.864Z] 👀 Monitoring all requests...
+
+[2025-08-10T16:47:37.109Z] 🔗 Mongoose connected to MongoDB
+[2025-08-10T16:47:37.112Z] 🗄️ Connected to MongoDB successfully
+📊 Resumed usage tracking for server: http://localhost:3000/api
+[2025-08-10T16:47:38.861Z] GET /api/health - IP: ::1
+[2025-08-10T16:47:38.861Z] Response: 200 GET /api/health
+[2025-08-10T16:47:38.964Z] POST /api/admin/auth/login - IP: ::1
+[2025-08-10T16:47:38.964Z] Request Body: { username: 'mokani', password: '[HIDDEN]' }
+[2025-08-10T16:47:38.964Z] 🔐 Admin login attempt for username: mokani
+[2025-08-10T16:47:38.964Z] ✅ Admin login successful: mokani
+[2025-08-10T16:47:38.964Z] Response: 200 POST /api/admin/auth/login
+[2025-08-10T16:47:39.207Z] GET /api/admin/stats - IP: ::1
+[2025-08-10T16:47:39.207Z] Response: 200 GET /api/admin/stats
+[2025-08-10T16:47:39.323Z] GET /api/health - IP: ::1
+[2025-08-10T16:47:39.323Z] Response: 200 GET /api/health
+[2025-08-10T16:47:39.432Z] GET /api/admin/recent-activity - IP: ::1
+[2025-08-10T16:47:39.432Z] Response: 200 GET /api/admin/recent-activity
+[2025-08-10T16:47:41.294Z] GET /api/health - IP: ::1
+[2025-08-10T16:47:41.294Z] Response: 200 GET /api/health
+[2025-08-10T16:47:41.316Z] GET /api/health - IP: ::1
+[2025-08-10T16:47:41.321Z] GET /api/admin/server-usage - IP: ::1
+[2025-08-10T16:47:41.321Z] Response: 200 GET /api/admin/server-usage
+[2025-08-10T16:47:41.316Z] Response: 200 GET /api/health
+[2025-08-10T16:47:41.341Z] GET /api/admin/server-analytics?days=7 - IP: ::1
+[2025-08-10T16:47:41.341Z] Response: 200 GET /api/admin/server-analytics?days=7
+[2025-08-10T16:47:42.327Z] GET /api/health - IP: ::1
+[2025-08-10T16:47:42.327Z] Response: 200 GET /api/health
+[2025-08-10T16:47:42.354Z] GET /api/admin/api-keys - IP: ::1
+[2025-08-10T16:47:42.354Z] Response: 200 GET /api/admin/api-keys
+[2025-08-10T16:47:42.978Z] GET /api/health - IP: ::1
+[2025-08-10T16:47:42.978Z] Response: 200 GET /api/health
+[2025-08-10T16:47:48.547Z] GET /api/health - IP: ::1
+[2025-08-10T16:47:48.547Z] Response: 200 GET /api/health
+[2025-08-10T16:47:49.210Z] GET /api/health - IP: ::1
+[2025-08-10T16:47:49.210Z] Response: 200 GET /api/health
+[2025-08-10T16:48:19.458Z] GET /api/health - IP: ::1
+[2025-08-10T16:48:19.458Z] Response: 200 GET /api/health
+[2025-08-10T16:48:49.457Z] GET /api/health - IP: ::1
+[2025-08-10T16:48:49.457Z] Response: 200 GET /api/health
+[2025-08-10T16:49:19.454Z] GET /api/health - IP: ::1
+[2025-08-10T16:49:19.454Z] Response: 200 GET /api/health
+[2025-08-10T16:49:49.461Z] GET /api/health - IP: ::1
+[2025-08-10T16:49:49.461Z] Response: 200 GET /api/health
+[2025-08-10T16:50:19.458Z] GET /api/health - IP: ::1
+[2025-08-10T16:50:19.458Z] Response: 200 GET /api/health
+[2025-08-10T16:50:49.459Z] GET /api/health - IP: ::1
+[2025-08-10T16:50:49.459Z] Response: 200 GET /api/health
+[2025-08-10T16:51:48.473Z] GET /api/health - IP: ::1
+[2025-08-10T16:51:48.473Z] Response: 200 GET /api/health
+[2025-08-10T16:52:19.461Z] GET /api/health - IP: ::1
+[2025-08-10T16:52:19.461Z] Response: 200 GET /api/health
+[2025-08-10T16:52:49.462Z] GET /api/health - IP: ::1
+[2025-08-10T16:52:49.462Z] Response: 200 GET /api/health
