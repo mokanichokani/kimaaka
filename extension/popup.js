@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const cacheStatusDisplay = document.getElementById('cacheStatusDisplay');
     const timeRemainingDisplay = document.getElementById('timeRemainingDisplay');
     const currentServerDisplay = document.getElementById('currentServerDisplay');
+    const serverStatusIndicator = document.getElementById('serverStatusIndicator');
     
     // Donation elements
     const donateApiKeyInput = document.getElementById('donateApiKey');
@@ -107,12 +108,48 @@ document.addEventListener('DOMContentLoaded', () => {
     async function updateTestingInfo() {
         try {
             const TWO_HOURS_MS = 2 * 60 * 60 * 1000;
-            const result = await chrome.storage.local.get(['cachedApiKey', 'keyTimestamp', 'serverIndex']);
+            const result = await chrome.storage.local.get([
+                'cachedApiKey', 
+                'keyTimestamp', 
+                'lastUsedServer', 
+                'lastUsedServerIndex', 
+                'lastUsedServerPort',
+                'lastServerUseTime'
+            ]);
             const now = Date.now();
             
-            // Show current server
-            const serverIndex = result.serverIndex || 0;
-            currentServerDisplay.textContent = `Server ${serverIndex + 1}/5`;
+            // Show current/last used server with more detail
+            if (result.lastUsedServer && result.lastUsedServerPort) {
+                const serverIndex = result.lastUsedServerIndex || 0;
+                const port = result.lastUsedServerPort;
+                const useTime = result.lastServerUseTime;
+                
+                let serverDisplay = `Port ${port} (${serverIndex + 1}/5)`;
+                let statusClass = '';
+                
+                if (useTime) {
+                    const timeSinceUse = now - useTime;
+                    if (timeSinceUse < 60000) { // Less than 1 minute
+                        serverDisplay += ` - Active`;
+                        statusClass = '';
+                    } else if (timeSinceUse < 300000) { // Less than 5 minutes
+                        const minutesAgo = Math.floor(timeSinceUse / 60000);
+                        serverDisplay += ` - ${minutesAgo}m ago`;
+                        statusClass = 'idle';
+                    } else {
+                        serverDisplay += ` - Idle`;
+                        statusClass = 'idle';
+                    }
+                } else {
+                    statusClass = 'inactive';
+                }
+                
+                currentServerDisplay.textContent = serverDisplay;
+                serverStatusIndicator.className = `status-indicator ${statusClass}`;
+            } else {
+                currentServerDisplay.textContent = "No server used yet";
+                serverStatusIndicator.className = 'status-indicator inactive';
+            }
             
             if (result.cachedApiKey) {
                 // Show first and last 4 characters of API key
@@ -146,6 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (error) {
             currentServerDisplay.textContent = "Error";
+            serverStatusIndicator.className = 'status-indicator inactive';
             apiKeyDisplay.textContent = "Error loading";
             cacheStatusDisplay.textContent = "Error";
             timeRemainingDisplay.textContent = "Error";

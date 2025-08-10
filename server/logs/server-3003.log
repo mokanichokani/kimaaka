@@ -5,48 +5,193 @@ JWT_SECRET exists: true
 MONGODB_URI starts with mongodb: true
 
 ============================================================
-[2025-08-10T16:47:42.957Z] 🚀 Kimaaka Server Started Successfully!
-[2025-08-10T16:47:42.957Z] 🌐 Server running on port 3003
-[2025-08-10T16:47:42.957Z] 📊 Admin panel (via server): http://localhost:3003/admin/admin.html
-[2025-08-10T16:47:42.957Z] 📊 Admin panel (standalone): See admin-dashboard/README.md
-[2025-08-10T16:47:42.957Z] 🔑 API endpoint: http://localhost:3003/api/gemini-key
-[2025-08-10T16:47:42.957Z] 💝 Donation endpoint: http://localhost:3003/api/donate-key
-[2025-08-10T16:47:42.957Z] 📋 Health check: http://localhost:3003/api/health
+[2025-08-10T16:56:35.262Z] 🚀 Kimaaka Server Started Successfully!
+[2025-08-10T16:56:35.262Z] 🌐 Server running on port 3003
+[2025-08-10T16:56:35.262Z] 📊 Admin panel (via server): http://localhost:3003/admin/admin.html
+[2025-08-10T16:56:35.262Z] 📊 Admin panel (standalone): See admin-dashboard/README.md
+[2025-08-10T16:56:35.262Z] 🔑 API endpoint: http://localhost:3003/api/gemini-key
+[2025-08-10T16:56:35.262Z] 💝 Donation endpoint: http://localhost:3003/api/donate-key
+[2025-08-10T16:56:35.262Z] 📋 Health check: http://localhost:3003/api/health
 ============================================================
-[2025-08-10T16:47:42.957Z] 👀 Monitoring all requests...
+[2025-08-10T16:56:35.262Z] 👀 Monitoring all requests...
 
-[2025-08-10T16:47:42.980Z] GET /api/health - IP: ::1
-Health check error: MongooseError: Cannot call `apikeys.countDocuments()` before initial connection is complete if `bufferCommands = false`. Make sure you `await mongoose.connect()` if you have `bufferCommands = false`.
-    at NativeCollection.<computed> [as countDocuments] (/Users/mokanichokani/Documents/mcCode/Kimaaka/Kimaaka-extension/ISEkimaaka/server/node_modules/mongoose/lib/drivers/node-mongodb-native/collection.js:237:15)
-    at model.Query._countDocuments (/Users/mokanichokani/Documents/mcCode/Kimaaka/Kimaaka-extension/ISEkimaaka/server/node_modules/mongoose/lib/query.js:2808:34)
-    at model.Query.exec (/Users/mokanichokani/Documents/mcCode/Kimaaka/Kimaaka-extension/ISEkimaaka/server/node_modules/mongoose/lib/query.js:4627:80)
-    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
-    at async Promise.all (index 0)
-    at async /Users/mokanichokani/Documents/mcCode/Kimaaka/Kimaaka-extension/ISEkimaaka/server/server.js:823:52
-[2025-08-10T16:47:42.980Z] Response: 503 GET /api/health
-[2025-08-10T16:47:42.980Z] Error Response: {"status":"unhealthy","database":"error","error":"Cannot call `apikeys.countDocuments()` before initial connection is complete if `bufferCommands = false`. Make sure you `await mongoose.connect()` if you have `bufferCommands = false`.","timestamp":"2025-08-10T16:47:42.982Z"}
-[2025-08-10T16:47:43.123Z] 🔗 Mongoose connected to MongoDB
-[2025-08-10T16:47:43.123Z] 🗄️ Connected to MongoDB successfully
+[2025-08-10T16:56:35.467Z] 🔗 Mongoose connected to MongoDB
+[2025-08-10T16:56:35.468Z] 🗄️ Connected to MongoDB successfully
 📊 Resumed usage tracking for server: http://localhost:3003/api
-[2025-08-10T16:47:48.545Z] GET /api/health - IP: ::1
-[2025-08-10T16:47:48.545Z] Response: 200 GET /api/health
-[2025-08-10T16:47:49.210Z] GET /api/health - IP: ::1
-[2025-08-10T16:47:49.210Z] Response: 200 GET /api/health
-[2025-08-10T16:48:19.458Z] GET /api/health - IP: ::1
-[2025-08-10T16:48:19.458Z] Response: 200 GET /api/health
-[2025-08-10T16:48:49.457Z] GET /api/health - IP: ::1
-[2025-08-10T16:48:49.457Z] Response: 200 GET /api/health
-[2025-08-10T16:49:19.455Z] GET /api/health - IP: ::1
-[2025-08-10T16:49:19.455Z] Response: 200 GET /api/health
-[2025-08-10T16:49:49.464Z] GET /api/health - IP: ::1
-[2025-08-10T16:49:49.464Z] Response: 200 GET /api/health
-[2025-08-10T16:50:19.458Z] GET /api/health - IP: ::1
-[2025-08-10T16:50:19.458Z] Response: 200 GET /api/health
-[2025-08-10T16:50:49.461Z] GET /api/health - IP: ::1
-[2025-08-10T16:50:49.461Z] Response: 200 GET /api/health
-[2025-08-10T16:51:48.474Z] GET /api/health - IP: ::1
-[2025-08-10T16:51:48.474Z] Response: 200 GET /api/health
-[2025-08-10T16:52:19.462Z] GET /api/health - IP: ::1
-[2025-08-10T16:52:19.462Z] Response: 200 GET /api/health
-[2025-08-10T16:52:49.462Z] GET /api/health - IP: ::1
-[2025-08-10T16:52:49.462Z] Response: 200 GET /api/health
+[2025-08-10T16:59:30.704Z] GET /api/health - IP: ::1
+[2025-08-10T16:59:30.704Z] Response: 200 GET /api/health
+[2025-08-10T16:59:37.913Z] GET /api/health - IP: ::1
+[2025-08-10T16:59:37.913Z] Response: 200 GET /api/health
+[2025-08-10T16:59:39.955Z] GET /api/health - IP: ::1
+[2025-08-10T16:59:39.955Z] Response: 200 GET /api/health
+[2025-08-10T16:59:54.522Z] GET /api/health - IP: ::1
+[2025-08-10T16:59:54.522Z] Response: 200 GET /api/health
+[2025-08-10T17:10:32.091Z] GET /api/health - IP: ::1
+[2025-08-10T17:10:32.091Z] Response: 200 GET /api/health
+[2025-08-10T17:10:35.577Z] GET /api/health - IP: ::1
+[2025-08-10T17:10:35.577Z] Response: 200 GET /api/health
+[2025-08-10T17:10:46.320Z] GET /api/health - IP: ::1
+[2025-08-10T17:10:46.320Z] Response: 200 GET /api/health
+[2025-08-10T17:11:01.445Z] GET /api/health - IP: ::1
+[2025-08-10T17:11:01.445Z] Response: 200 GET /api/health
+[2025-08-10T17:11:31.446Z] GET /api/health - IP: ::1
+[2025-08-10T17:11:31.446Z] Response: 200 GET /api/health
+[2025-08-10T17:12:32.445Z] GET /api/health - IP: ::1
+[2025-08-10T17:12:32.445Z] Response: 200 GET /api/health
+[2025-08-10T17:13:33.448Z] GET /api/health - IP: ::1
+[2025-08-10T17:13:33.448Z] Response: 200 GET /api/health
+[2025-08-10T17:14:00.541Z] GET /api/health - IP: ::1
+[2025-08-10T17:14:00.541Z] Response: 200 GET /api/health
+[2025-08-10T17:14:08.832Z] GET /api/health - IP: ::1
+[2025-08-10T17:14:08.832Z] Response: 200 GET /api/health
+[2025-08-10T17:14:10.161Z] GET /api/health - IP: ::1
+[2025-08-10T17:14:10.161Z] Response: 200 GET /api/health
+[2025-08-10T17:19:49.358Z] GET /api/health - IP: ::1
+[2025-08-10T17:19:49.358Z] Response: 200 GET /api/health
+[2025-08-10T17:19:59.390Z] GET /api/health - IP: ::1
+[2025-08-10T17:19:59.390Z] Response: 200 GET /api/health
+[2025-08-10T17:20:00.533Z] GET /api/health - IP: ::1
+[2025-08-10T17:20:00.533Z] Response: 200 GET /api/health
+[2025-08-10T17:21:35.057Z] GET /api/health - IP: ::1
+[2025-08-10T17:21:35.057Z] Response: 200 GET /api/health
+[2025-08-10T17:22:01.440Z] GET /api/health - IP: ::1
+[2025-08-10T17:22:01.440Z] Response: 200 GET /api/health
+[2025-08-10T17:22:31.438Z] GET /api/health - IP: ::1
+[2025-08-10T17:22:31.438Z] Response: 200 GET /api/health
+[2025-08-10T17:22:56.354Z] GET /api/health - IP: ::1
+[2025-08-10T17:22:56.354Z] Response: 200 GET /api/health
+[2025-08-10T17:23:00.559Z] GET /api/health - IP: ::1
+[2025-08-10T17:23:00.559Z] Response: 200 GET /api/health
+[2025-08-10T17:23:03.070Z] GET /api/health - IP: ::1
+[2025-08-10T17:23:03.070Z] Response: 200 GET /api/health
+[2025-08-10T17:23:03.937Z] GET /api/health - IP: ::1
+[2025-08-10T17:23:03.937Z] Response: 200 GET /api/health
+[2025-08-10T17:23:04.696Z] GET /api/health - IP: ::1
+[2025-08-10T17:23:04.696Z] Response: 200 GET /api/health
+[2025-08-10T17:23:10.301Z] GET /api/health - IP: ::1
+[2025-08-10T17:23:10.301Z] Response: 200 GET /api/health
+[2025-08-10T17:23:11.259Z] GET /api/health - IP: ::1
+[2025-08-10T17:23:11.259Z] Response: 200 GET /api/health
+[2025-08-10T17:23:20.455Z] GET /api/health - IP: ::1
+[2025-08-10T17:23:20.455Z] Response: 200 GET /api/health
+[2025-08-10T17:23:21.115Z] GET /api/health - IP: ::1
+[2025-08-10T17:23:21.115Z] Response: 200 GET /api/health
+[2025-08-10T17:23:30.556Z] GET /api/health - IP: ::1
+[2025-08-10T17:23:30.556Z] Response: 200 GET /api/health
+[2025-08-10T17:24:01.472Z] GET /api/health - IP: ::1
+[2025-08-10T17:24:01.472Z] Response: 200 GET /api/health
+[2025-08-10T17:24:31.528Z] GET /api/health - IP: ::1
+[2025-08-10T17:24:31.528Z] Response: 200 GET /api/health
+[2025-08-10T17:25:01.471Z] GET /api/health - IP: ::1
+[2025-08-10T17:25:01.471Z] Response: 200 GET /api/health
+[2025-08-10T17:25:31.484Z] GET /api/health - IP: ::1
+[2025-08-10T17:25:31.484Z] Response: 200 GET /api/health
+[2025-08-10T17:26:32.722Z] GET /api/health - IP: ::1
+[2025-08-10T17:26:32.722Z] Response: 200 GET /api/health
+[2025-08-10T17:27:01.475Z] GET /api/health - IP: ::1
+[2025-08-10T17:27:01.475Z] Response: 200 GET /api/health
+[2025-08-10T17:27:31.471Z] GET /api/health - IP: ::1
+[2025-08-10T17:27:31.471Z] Response: 200 GET /api/health
+[2025-08-10T17:28:01.477Z] GET /api/health - IP: ::1
+[2025-08-10T17:28:01.477Z] Response: 200 GET /api/health
+[2025-08-10T17:28:48.476Z] GET /api/health - IP: ::1
+[2025-08-10T17:28:48.476Z] Response: 200 GET /api/health
+[2025-08-10T17:28:57.170Z] GET /api/health - IP: ::1
+[2025-08-10T17:29:08.962Z] GET /api/health - IP: ::1
+[2025-08-10T17:29:14.860Z] GET /api/health - IP: ::1
+[2025-08-10T17:29:14.860Z] Response: 200 GET /api/health
+[2025-08-10T17:29:08.962Z] Response: 200 GET /api/health
+[2025-08-10T17:28:57.170Z] Response: 200 GET /api/health
+[2025-08-10T17:29:16.010Z] GET /api/health - IP: ::1
+[2025-08-10T17:29:16.010Z] Response: 200 GET /api/health
+[2025-08-10T17:29:19.928Z] GET /api/health - IP: ::1
+[2025-08-10T17:29:19.928Z] Response: 503 GET /api/health
+[2025-08-10T17:29:19.928Z] Error Response: {"status":"unhealthy","database":"disconnected","timestamp":"2025-08-10T17:29:19.946Z"}
+[2025-08-10T17:29:25.186Z] GET /api/health - IP: ::1
+[2025-08-10T17:29:25.186Z] Response: 503 GET /api/health
+[2025-08-10T17:29:25.186Z] Error Response: {"status":"unhealthy","database":"disconnected","timestamp":"2025-08-10T17:29:25.423Z"}
+[2025-08-10T17:29:29.490Z] GET /api/health - IP: ::1
+[2025-08-10T17:29:29.490Z] Response: 200 GET /api/health
+[2025-08-10T17:29:35.900Z] GET /api/health - IP: ::1
+[2025-08-10T17:29:35.900Z] Response: 200 GET /api/health
+[2025-08-10T17:29:37.143Z] GET /api/health - IP: ::1
+[2025-08-10T17:29:37.143Z] Response: 200 GET /api/health
+[2025-08-10T17:29:38.900Z] GET /api/health - IP: ::1
+[2025-08-10T17:29:38.900Z] Response: 200 GET /api/health
+[2025-08-10T17:31:00.162Z] GET /api/gemini-key - IP: ::1
+[2025-08-10T17:31:00.162Z] 🔑 API Key Request - Using round-robin allocation...
+[2025-08-10T17:31:00.163Z] 🔄 Starting round-robin API key allocation...
+[2025-08-10T17:31:00.163Z] 🎯 Found 1 keys with minimum allocation count: 0
+[2025-08-10T17:31:00.163Z] 🧪 Testing admin key AIzaSyCq......
+[2025-08-10T17:31:00.199Z] 🧪 Testing API key AIzaSyCq... with Gemini API...
+[2025-08-10T17:31:00.199Z] ✅ API key AIzaSyCq... validation successful
+[2025-08-10T17:31:00.163Z] ✅ Key AIzaSyCq... is valid, allocating...
+[2025-08-10T17:31:00.163Z] 📊 Updated admin key allocation count to 1
+📈 Tracked allocation for http://localhost:3003/api - Total: 1
+[2025-08-10T17:31:00.162Z] ✅ API Key Provided: AIzaSyCq...RoSk (1372ms)
+[2025-08-10T17:31:00.162Z] Response: 200 GET /api/gemini-key
+[2025-08-10T17:35:43.459Z] GET /api/health - IP: ::1
+[2025-08-10T17:35:47.456Z] GET /api/health - IP: ::1
+[2025-08-10T17:35:51.459Z] GET /api/health - IP: ::1
+[2025-08-10T17:36:51.209Z] ⚠️ Mongoose disconnected from MongoDB
+[2025-08-10T17:37:13.323Z] 🔗 Mongoose connected to MongoDB
+[2025-08-10T17:35:47.456Z] Response: 200 GET /api/health
+📊 Resumed usage tracking for server: http://localhost:3003/api
+[2025-08-10T17:35:43.459Z] Response: 200 GET /api/health
+[2025-08-10T17:35:51.459Z] Response: 200 GET /api/health
+[2025-08-10T17:44:58.741Z] GET /api/gemini-key - IP: ::1
+[2025-08-10T17:44:58.745Z] 🔑 API Key Request - Using round-robin allocation...
+[2025-08-10T17:44:58.745Z] 🔄 Starting round-robin API key allocation...
+[2025-08-10T17:44:58.745Z] 🎯 Found 1 keys with minimum allocation count: 1
+[2025-08-10T17:44:58.745Z] 🧪 Testing admin key AIzaSyCq......
+[2025-08-10T17:44:58.803Z] 🧪 Testing API key AIzaSyCq... with Gemini API...
+[2025-08-10T17:44:58.803Z] ✅ API key AIzaSyCq... validation successful
+[2025-08-10T17:44:58.745Z] ✅ Key AIzaSyCq... is valid, allocating...
+[2025-08-10T17:44:58.745Z] 📊 Updated admin key allocation count to 2
+📈 Tracked allocation for http://localhost:3003/api - Total: 2
+[2025-08-10T17:44:58.745Z] ✅ API Key Provided: AIzaSyCq...RoSk (677ms)
+[2025-08-10T17:44:58.741Z] Response: 200 GET /api/gemini-key
+[2025-08-10T18:13:40.534Z] GET /api/health - IP: ::1
+[2025-08-10T18:13:40.534Z] Response: 200 GET /api/health
+[2025-08-10T18:13:46.149Z] GET /api/health - IP: ::1
+[2025-08-10T18:13:46.149Z] Response: 200 GET /api/health
+[2025-08-10T18:14:16.505Z] GET /api/health - IP: ::1
+[2025-08-10T18:14:16.505Z] Response: 200 GET /api/health
+[2025-08-10T18:14:46.516Z] GET /api/health - IP: ::1
+[2025-08-10T18:14:46.516Z] Response: 200 GET /api/health
+[2025-08-10T18:15:16.516Z] GET /api/health - IP: ::1
+[2025-08-10T18:15:16.516Z] Response: 200 GET /api/health
+[2025-08-10T18:15:46.520Z] GET /api/health - IP: ::1
+[2025-08-10T18:15:46.520Z] Response: 200 GET /api/health
+[2025-08-10T18:16:16.521Z] GET /api/health - IP: ::1
+[2025-08-10T18:16:16.521Z] Response: 200 GET /api/health
+[2025-08-10T18:16:21.345Z] GET /api/health - IP: ::1
+[2025-08-10T18:16:21.345Z] Response: 200 GET /api/health
+[2025-08-10T18:16:33.411Z] GET /api/health - IP: ::1
+[2025-08-10T18:16:33.411Z] Response: 200 GET /api/health
+[2025-08-10T18:16:46.518Z] GET /api/health - IP: ::1
+[2025-08-10T18:16:46.518Z] Response: 200 GET /api/health
+[2025-08-10T18:17:16.648Z] GET /api/health - IP: ::1
+[2025-08-10T18:17:16.648Z] Response: 200 GET /api/health
+[2025-08-10T18:17:48.512Z] GET /api/health - IP: ::1
+[2025-08-10T18:17:48.512Z] Response: 200 GET /api/health
+[2025-08-10T18:18:48.553Z] GET /api/health - IP: ::1
+[2025-08-10T18:18:48.553Z] Response: 200 GET /api/health
+[2025-08-10T18:19:48.519Z] GET /api/health - IP: ::1
+[2025-08-10T18:19:48.519Z] Response: 200 GET /api/health
+[2025-08-10T18:20:48.537Z] GET /api/health - IP: ::1
+[2025-08-10T18:20:48.537Z] Response: 200 GET /api/health
+[2025-08-10T18:21:48.534Z] GET /api/health - IP: ::1
+[2025-08-10T18:21:48.534Z] Response: 200 GET /api/health
+[2025-08-10T18:22:48.517Z] GET /api/health - IP: ::1
+[2025-08-10T18:22:48.517Z] Response: 200 GET /api/health
+[2025-08-10T18:23:48.535Z] GET /api/health - IP: ::1
+[2025-08-10T18:23:48.535Z] Response: 200 GET /api/health
+[2025-08-10T18:24:48.532Z] GET /api/health - IP: ::1
+[2025-08-10T18:24:48.532Z] Response: 200 GET /api/health
+[2025-08-10T18:25:48.534Z] GET /api/health - IP: ::1
+[2025-08-10T18:25:48.534Z] Response: 200 GET /api/health
+[2025-08-10T18:26:48.532Z] GET /api/health - IP: ::1
+[2025-08-10T18:26:48.532Z] Response: 200 GET /api/health
+[2025-08-10T18:27:48.537Z] GET /api/health - IP: ::1
+[2025-08-10T18:27:48.537Z] Response: 200 GET /api/health

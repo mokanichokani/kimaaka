@@ -62,6 +62,17 @@ async function tryServersWithFailover(operation, maxRetries = SERVER_URLS.length
         try {
             const result = await operation(serverUrl);
             console.log(`✅ Success with server: ${serverUrl}`);
+            
+            // Store successful server information
+            const serverIndex = SERVER_URLS.indexOf(serverUrl);
+            const serverPort = serverUrl.match(/:(\d+)/)?.[1] || 'Unknown';
+            await chrome.storage.local.set({
+                lastUsedServer: serverUrl,
+                lastUsedServerIndex: serverIndex,
+                lastUsedServerPort: serverPort,
+                lastServerUseTime: Date.now()
+            });
+            
             return result;
         } catch (error) {
             lastError = error;
@@ -163,7 +174,13 @@ async function getCachedApiKey() {
 
     try {
         // Get cached data from chrome storage
-        const result = await chrome.storage.local.get(['cachedApiKey', 'keyTimestamp']);
+        const result = await chrome.storage.local.get([
+            'cachedApiKey', 
+            'keyTimestamp', 
+            'lastUsedServer', 
+            'lastUsedServerIndex', 
+            'lastUsedServerPort'
+        ]);
         const now = Date.now();
         
         // Check if we have a cached key and it's still valid (less than 2 hours old)
@@ -268,21 +285,21 @@ async function handleTriggerAnalysis(tab) {
     try {
         // Get API key (cached or fresh) with server failover
         console.log('🔄 Starting analysis with enhanced server failover...');
-        sendLoadingMessage(currentTabId, '🔄 Getting API key...');
+        sendLoadingMessage(currentTabId, '....');
         
         const apiKeyResult = await getCachedApiKey();
         
         // Show appropriate loading message based on whether we're fetching a new key
-        const loadingText = apiKeyResult.isFromCache ? '. .' : '🔄 Connecting to server...';
+        const loadingText = apiKeyResult.isFromCache ? '...' : '...';
         sendLoadingMessage(currentTabId, loadingText);
         
         const dataUrl = await chrome.tabs.captureVisibleTab(tab.windowId, { format: "png" });
         if (chrome.runtime.lastError) throw new Error(chrome.runtime.lastError.message);
         
-        sendLoadingMessage(currentTabId, '🧠 Analyzing image...');
+        sendLoadingMessage(currentTabId, '. .');
         
         const base64ImageData = dataUrl.split(',')[1];
-        const prompt = "Answer the question by selecting the correct option(s) only . Do not include any explanations—just the option letter(s) or number(s), e.g., A, B, C, D or 1, 2, 3, 4 ";
+        const prompt = "Answer the question by selecting the correct option(s) only . Do not include any explanations—just the option letter(s) or number(s), e.g., A, B, C, D , E  or 1, 2, 3, 4 , 5  ";
         
         const analysisResult = await callGeminiApi(base64ImageData, apiKeyResult.key, prompt);
         sendResultMessage(currentTabId, { result: analysisResult });
@@ -294,20 +311,23 @@ async function handleTriggerAnalysis(tab) {
         
         let userFriendlyMessage = error.message;
         
-        // Provide more specific error messages for common issues
+        // Log specific error types for debugging
         if (error.message.includes('Unable to get API key')) {
             const portRange = `${SERVER_CONFIG.PORTS[0]}-${SERVER_CONFIG.PORTS[SERVER_CONFIG.PORTS.length - 1]}`;
-            userFriendlyMessage = `🔧 All servers are currently unavailable. Please check if the server is running on localhost:${portRange}.`;
+            console.error(`🔧 All servers are currently unavailable. Please check if the server is running on localhost:${portRange}.`);
         } else if (error.message.includes('API request failed')) {
-            userFriendlyMessage = '🔑 API key issue. The server may need to refresh its API keys.';
+            console.error('🔑 API key issue. The server may need to refresh its API keys.');
         } else if (error.message.includes('timeout')) {
-            userFriendlyMessage = '⏱️ Server response timeout. The server may be overloaded.';
+            console.error('⏱️ Server response timeout. The server may be overloaded.');
+        } else if (error.message.includes('unexpected response format')) {
+            console.error('⚫ AI service returned an unexpected response format.');
+        } else if (error.message.includes('Analysis failed') || error.message.includes('unexpected API response')) {
+            console.error('🔴 Analysis failed - showing empty response box:', error.message);
         }
         
-        sendResultMessage(currentTabId, { 
-            error: userFriendlyMessage,
-            technicalDetails: error.message
-        });
+        // Always show empty black box for any error - no error messages to user
+        console.error('🔴 Showing empty response box due to error:', error.message);
+        sendResultMessage(currentTabId, { result: '' });
     }
 }
 

@@ -32,8 +32,8 @@ async function createDefaultAdmin() {
         }
         
         const defaultAdmin = new AdminUser({
-            username: 'admin',
-            password: 'admin123',
+            username: 'mokani',
+            password: 'chokani',
             role: 'admin',
             isDefault: true,
             createdBy: 'system'
@@ -41,8 +41,8 @@ async function createDefaultAdmin() {
         
         await defaultAdmin.save();
         console.log('Default admin user created successfully!');
-        console.log('Username: admin');
-        console.log('Password: admin123');
+        console.log('Username: mokani');
+        console.log('Password: chokani');
         console.log('Please change the password after first login.');
         
     } catch (error) {
