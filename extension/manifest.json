@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "kimaaka",
+  "name": "Kimaaka",
   "version": "3.0.0",
-  "description": "Captures the current screen on any website, sends it to Gemini for analysis, and displays the result. Injects only on user command.",
+  "description": "AI-powered multiple choice question solver that analyzes screenshots & highlights correct answers with color-coded indicators.",
   "permissions": [
     "activeTab",
     "storage",

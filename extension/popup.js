@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.warn('Server selection warning:', response.warning);
             }
             
-            const serverUrl = response.serverUrl || 'https://server-t1gp.onrender.com/api';
+            const serverUrl = response.serverUrl || 'https://kimaakaserver1.onrender.com/api';
             
             console.log(`Donating to server: ${serverUrl}`);
             

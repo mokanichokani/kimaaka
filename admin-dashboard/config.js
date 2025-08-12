@@ -17,11 +17,11 @@ const SERVER_CONFIG = {
     PRODUCTION: {
         // Example production servers
         URLS: [
-            'https://moonlight-api.onrender.com',
-            'https://stardust-server.onrender.com',
-            'https://aurora-backend.onrender.com',
-            'https://nebula-service.onrender.com',
-            'https://comet-gateway.onrender.com'
+            'https://kimaakaserver1.onrender.com',
+            'https://kimaakaserver2.onrender.com',
+            'https://kimaakaserver3.onrender.com',
+            'https://kimaakaserver4.onrender.com',
+            'https://kimaakaserver5.onrender.com'
         ]
     },
     

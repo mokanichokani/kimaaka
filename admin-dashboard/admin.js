@@ -207,10 +207,14 @@ async function loadOverview() {
         // Get aggregated statistics from all available servers
         const stats = await getAggregatedServerStats();
         
+        // Basic counts
         document.getElementById('totalApiKeys').textContent = stats.totalApiKeys || 0;
         document.getElementById('activeApiKeys').textContent = stats.activeApiKeys || 0;
         document.getElementById('donatedApiKeys').textContent = stats.donatedApiKeys || 0;
         document.getElementById('onlineServers').textContent = await getOnlineServerCount();
+        
+        // Load detailed usage statistics
+        await loadUsageStatistics(stats);
         
         loadRecentActivity();
     } catch (error) {
@@ -221,6 +225,115 @@ async function loadOverview() {
             showAlert('Failed to load overview data', 'error');
         }
     }
+}
+
+async function loadUsageStatistics(baseStats) {
+    try {
+        const serverUrl = await getWorkingServerUrl();
+        const response = await fetch(`${serverUrl}/api/admin/usage-statistics?days=7`, {
+            headers: getAuthHeaders()
+        });
+        
+        if (!response.ok) {
+            console.warn('Failed to load usage statistics:', response.status);
+            return;
+        }
+        
+        const usageStats = await response.json();
+        console.log('Usage statistics loaded:', usageStats);
+        
+        // Update overview cards with usage data
+        const totalCallsElement = document.getElementById('totalApiCalls');
+        const totalAllocationsElement = document.getElementById('totalAllocations');
+        const successRateElement = document.getElementById('successRate');
+        const avgResponseTimeElement = document.getElementById('avgResponseTime');
+        const lastUsedElement = document.getElementById('lastUsed');
+        const serverUptimeElement = document.getElementById('serverUptime');
+        
+        if (totalCallsElement) {
+            totalCallsElement.textContent = (usageStats.summary.totalApiCalls || 0).toLocaleString();
+        }
+        
+        if (totalAllocationsElement) {
+            totalAllocationsElement.textContent = (usageStats.summary.totalAllocations || 0).toLocaleString();
+        }
+        
+        if (successRateElement && usageStats.currentServer) {
+            const total = usageStats.currentServer.successfulRequests + usageStats.currentServer.failedRequests;
+            const rate = total > 0 ? 
+                ((usageStats.currentServer.successfulRequests / total) * 100).toFixed(1) : '100.0';
+            successRateElement.textContent = rate + '%';
+        }
+        
+        if (avgResponseTimeElement && usageStats.currentServer) {
+            avgResponseTimeElement.textContent = Math.round(usageStats.currentServer.averageResponseTime || 0) + 'ms';
+        }
+        
+        if (lastUsedElement && usageStats.currentServer.lastUsed) {
+            const lastUsed = new Date(usageStats.currentServer.lastUsed);
+            const now = new Date();
+            const diffMinutes = Math.floor((now - lastUsed) / (1000 * 60));
+            
+            if (diffMinutes < 1) {
+                lastUsedElement.textContent = 'Just now';
+            } else if (diffMinutes < 60) {
+                lastUsedElement.textContent = `${diffMinutes}m ago`;
+            } else if (diffMinutes < 1440) {
+                lastUsedElement.textContent = `${Math.floor(diffMinutes / 60)}h ago`;
+            } else {
+                lastUsedElement.textContent = `${Math.floor(diffMinutes / 1440)}d ago`;
+            }
+        } else if (lastUsedElement) {
+            lastUsedElement.textContent = 'Never';
+        }
+        
+        if (serverUptimeElement && usageStats.currentServer) {
+            const uptimeSeconds = usageStats.currentServer.uptime || 0;
+            const hours = Math.floor(uptimeSeconds / 3600);
+            const minutes = Math.floor((uptimeSeconds % 3600) / 60);
+            serverUptimeElement.textContent = `${hours}h ${minutes}m`;
+        }
+        
+        // Create usage breakdown chart if container exists
+        createUsageBreakdownChart(usageStats);
+        
+    } catch (error) {
+        console.error('Error loading usage statistics:', error);
+    }
+}
+
+function createUsageBreakdownChart(usageStats) {
+    const chartContainer = document.getElementById('usageChart');
+    if (!chartContainer) return;
+    
+    const dailyData = usageStats.dailyBreakdown || [];
+    if (dailyData.length === 0) {
+        chartContainer.innerHTML = '<p>No usage data available for chart</p>';
+        return;
+    }
+    
+    // Simple ASCII-style chart for daily API calls
+    const maxCalls = Math.max(...dailyData.map(d => d.apiCalls || 0));
+    const chartHeight = 100;
+    
+    let chartHTML = '<div class="usage-chart">';
+    chartHTML += '<h4>API Calls (Last 7 Days)</h4>';
+    chartHTML += '<div class="chart-container" style="display: flex; align-items: end; height: 120px; gap: 5px; margin: 10px 0;">';
+    
+    dailyData.slice(-7).forEach(day => {
+        const height = maxCalls > 0 ? Math.max(5, (day.apiCalls / maxCalls) * chartHeight) : 5;
+        const date = new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        
+        chartHTML += `
+            <div class="chart-bar" style="background: #007bff; width: 30px; height: ${height}px; position: relative;" title="${day.apiCalls} calls on ${date}">
+                <div style="position: absolute; bottom: -20px; font-size: 10px; transform: rotate(-45deg); transform-origin: bottom;">${date}</div>
+                <div style="position: absolute; top: -20px; font-size: 10px; text-align: center; width: 100%;">${day.apiCalls}</div>
+            </div>
+        `;
+    });
+    
+    chartHTML += '</div></div>';
+    chartContainer.innerHTML = chartHTML;
 }
 
 async function loadRecentActivity() {
@@ -472,7 +585,7 @@ async function checkAllServers() {
     });
     
     try {
-        const serverStatuses = await Prom.all(serverProms);
+        const serverStatuses = await Promise.all(serverProms);
         
         container.innerHTML = serverStatuses.map(server => `
             <div class="server-card">
@@ -519,7 +632,7 @@ async function getOnlineServerCount() {
         }
     });
     
-    const results = await Prom.all(proms);
+    const results = await Promise.all(proms);
     return results.filter(Boolean).length;
 }
 
@@ -836,7 +949,7 @@ async function exportData() {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `api-backup-${new Date().toISOString().split('T')[0]}.json`;
+        a.download = `kimaaka-backup-${new Date().toISOString().split('T')[0]}.json`;
         a.click();
         URL.revokeObjectURL(url);
         
@@ -1011,7 +1124,7 @@ async function getAggregatedServerStats() {
         }
     });
     
-    const serverResults = await Prom.all(serverProms);
+    const serverResults = await Promise.all(serverProms);
     console.log('All server results:', serverResults);
     
     // Get the first working server's stats as the base (since API keys are shared across servers)
@@ -1353,8 +1466,8 @@ async function testMockData() {
         successRate: '94.7',
         servers: [
             {
-                identifier: 'moonlight-api.onrender.com',
-                url: 'https://moonlight-api.onrender.com',
+                identifier: 'kimaakaserver1.onrender.com',
+                url: 'https://kimaakaserver1.onrender.com',
                 status: 'online',
                 stats: {
                     totalApiKeys: 4,
@@ -1369,8 +1482,8 @@ async function testMockData() {
                 }
             },
             {
-                identifier: 'stardust-server.onrender.com',
-                url: 'https://stardust-server.onrender.com',
+                identifier: 'kimaakaserver2.onrender.com',
+                url: 'https://kimaakaserver2.onrender.com',
                 status: 'online',
                 stats: {
                     totalApiKeys: 4,
@@ -1669,7 +1782,7 @@ async function resetServerStats() {
             }
         });
 
-        await Prom.all(resetProms);
+        await Promise.all(resetProms);
         
         if (successCount > 0) {
             showAlert(`Server statistics reset successfully on ${successCount}/${totalServers} server(s)`, 'success');
@@ -1747,7 +1860,7 @@ async function testServerHealth() {
             }
         });
         
-        const results = await Prom.all(proms);
+        const results = await Promise.all(proms);
         const onlineCount = results.filter(r => r.status === 'online').length;
         
         let html = '<h4>❤️ Health Test Results</h4>';
@@ -1818,7 +1931,7 @@ async function testAdminEndpoints() {
             }
         });
         
-        const results = await Prom.all(proms);
+        const results = await Promise.all(proms);
         const securedCount = results.filter(r => r.requiresAuth).length;
         const accessibleCount = results.filter(r => r.accessible).length;
         
