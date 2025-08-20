@@ -2,7 +2,7 @@
 
 ![Kimaaka Logo](public/isekimaaka.png)
 
-**Version:** 3.0.0  
+**Version:** 3.0.1  
 **Description:** An intelligent educational Chrome extension that helps students learn by providing instant visual feedback on multiple choice questions using AI-powered analysis for study assistance.maaka - Educational Quiz Assistant
 
 
