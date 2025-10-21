@@ -106,23 +106,6 @@
             font-weight: 500;
             color: #856404;
         }
-        .server-status {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .status-indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: #28a745;
-        }
-        .status-indicator.idle {
-            background-color: #ffc107;
-        }
-        .status-indicator.inactive {
-            background-color: #6c757d;
-        }
         #apiKeyDisplay {
             font-family: monospace;
             font-size: 10px;
@@ -218,13 +201,6 @@
         <div class="testing-section">
             <div class="testing-title">System Info:</div>
             <div class="testing-item">
-                <span class="testing-label">Allocated Server:</span>
-                <div class="server-status">
-                    <span class="status-indicator" id="serverStatusIndicator"></span>
-                    <span id="currentServerDisplay">Loading...</span>
-                </div>
-            </div>
-            <div class="testing-item">
                 <span class="testing-label">API Key:</span>
                 <span id="apiKeyDisplay">Loading...</span>
             </div>
@@ -242,7 +218,7 @@
         <div class="donate-section">
             <div class="donate-title">💝 Donate a Gemini API Key</div>
             <input type="text" id="donateApiKey" class="donate-input" placeholder="Enter your Gemini API key" />
-            <input type="email" id="donateEmail" class="donate-input" placeholder=" Your name bbg ;) * " />
+            <input type="text" id="donateEmail" class="donate-input" placeholder=" Your name bbg ;) * " required />
             <button id="donateButton" class="donate-button">Donate Key</button>
             <div id="donateStatus" class="donate-status hidden"></div>
         </div>

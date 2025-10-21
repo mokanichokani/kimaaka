@@ -1,0 +1,38 @@
+{
+   "action": {
+      "default_icon": {
+         "128": "icons/icon128.png",
+         "16": "icons/icon16.png",
+         "32": "icons/icon32.png",
+         "48": "icons/icon48.png"
+      },
+      "default_popup": "popup.html"
+   },
+   "background": {
+      "service_worker": "background.js"
+   },
+   "commands": {
+      "trigger_analysis": {
+         "description": "Analyze screen with Gemini",
+         "suggested_key": {
+            "default": "Ctrl+Shift+Y",
+            "mac": "Command+Shift+Y"
+         }
+      }
+   },
+   "description": "AI-powered multiple choice question solver that analyzes screenshots & highlights correct answers with color-coded indicators.",
+   "host_permissions": [ "\u003Call_urls>", "https://generativelanguage.googleapis.com/", "https://kimaakaserver1.onrender.com/", "https://kimaakaserver2.onrender.com/", "https://kimaakaserver3.onrender.com/", "https://kimaakaserver4.onrender.com/", "https://kimaakaserver5.onrender.com/" ],
+   "icons": {
+      "128": "icons/icon128.png",
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzIWnaeRO0l5xhLmapEabEKGBSaSjzeTkBM+NSjwOHCvR0Algzw2ObNJwVve1TiC9/HARnv5fvTzp5Dxss5uG+2bdZ46/WGb+DZ38yhDpJA4dq/I7WamKBXBiYUSiRu1FAUIxXGL5XKYfG4uvQBBZX3JufLr4jD+xo0WyJMMNr+lml/zO9hwcU2/ODHtiX9rgHo6mdSvqNkTtJlu/5dahIIz+Nsgj2GtSsgAKl4n54zIM01kGoYz9sTs+H7Rn+CG5Qm6bYTnRGpid5wYGttsMJqusbWqVWCltvwnp8uwU1GxXDCWL+R5cD/kaay/ZDn+sN1Kgo6lPo0Vx9QgwLi7nYQIDAQAB",
+   "manifest_version": 3,
+   "name": "Kimaaka",
+   "options_page": "options.html",
+   "permissions": [ "activeTab", "storage", "scripting", "commands" ],
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "3.0.2"
+}
