@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kimaaka Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Impact', 'Arial Black', 'Helvetica Neue', Arial, sans-serif;
+            background: #000000;
+            min-height: 100vh;
+            padding: 20px;
+            color: #ffffff;
+            font-weight: 900;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 0;
+            box-shadow: 8px 8px 0px #000000;
+            overflow: hidden;
+            border: 4px solid #000000;
+        }
+
+        .header {
+            background: #ffff00;
+            color: #000000;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 4px solid #000000;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 4px 4px 0px #000000;
+        }
+
+        .header p {
+            font-size: 1.3rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #000000;
+            border-bottom: 4px solid #000000;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            background: #ffffff;
+            border: none;
+            border-right: 4px solid #000000;
+            font-size: 16px;
+            font-weight: 900;
+            color: #000000;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .nav-tab:last-child {
+            border-right: none;
+        }
+
+        .nav-tab.active {
+            background: #ff00ff;
+            color: #ffffff;
+            text-shadow: 2px 2px 0px #000000;
+        }
+
+        .nav-tab:hover {
+            background: #00ffff;
+            color: #000000;
+            transform: translateY(-2px);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tab-content p, .tab-content span, .tab-content div {
+            color: #000000;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 0;
+            border: 4px solid #000000;
+            box-shadow: 6px 6px 0px #000000;
+            transition: all 0.2s ease;
+        }
+
+        .section:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 8px 8px 0px #000000;
+        }
+
+        .section h3 {
+            color: #000000;
+            margin-bottom: 25px;
+            font-size: 2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 0px #ffff00;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 900;
+            color: #000000;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 15px 18px;
+            border: 4px solid #000000;
+            border-radius: 0;
+            font-size: 16px;
+            font-weight: 900;
+            transition: all 0.2s ease;
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .form-group input::placeholder, .form-group textarea::placeholder {
+            color: #666666;
+            font-weight: 700;
+        }
+
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none;
+            border-color: #ff00ff;
+            box-shadow: 4px 4px 0px #000000;
+            transform: translate(-2px, -2px);
+        }
+
+        .btn {
+            padding: 16px 32px;
+            border: 4px solid #000000;
+            border-radius: 0;
+            font-size: 16px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-right: 12px;
+            margin-bottom: 12px;
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            transform: translate(-2px, -2px);
+        }
+
+        .btn-primary {
+            background: #ff00ff;
+            color: #ffffff;
+            box-shadow: 4px 4px 0px #000000;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 6px 6px 0px #000000;
+        }
+
+        .btn-danger {
+            background: #ff0000;
+            color: #ffffff;
+            box-shadow: 4px 4px 0px #000000;
+        }
+
+        .btn-danger:hover {
+            box-shadow: 6px 6px 0px #000000;
+        }
+
+        .btn-success {
+            background: #00ff00;
+            color: #000000;
+            box-shadow: 4px 4px 0px #000000;
+        }
+
+        .btn-success:hover {
+            box-shadow: 6px 6px 0px #000000;
+        }
+
+        .btn-warning {
+            background: #ffff00;
+            color: #000000;
+            box-shadow: 4px 4px 0px #000000;
+        }
+
+        .btn-warning:hover {
+            box-shadow: 6px 6px 0px #000000;
+        }
+
+        .btn-secondary {
+            background: #000000;
+            color: #ffffff;
+            box-shadow: 4px 4px 0px #000000;
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 6px 6px 0px #000000;
+        }
+
+        .btn-info {
+            background: #00ffff;
+            color: #000000;
+            box-shadow: 4px 4px 0px #000000;
+        }
+
+        .btn-info:hover {
+            box-shadow: 6px 6px 0px #000000;
+        }
+
+        .api-key-list {
+            background: #ffffff;
+            border-radius: 0;
+            overflow: hidden;
+            border: 4px solid #000000;
+            box-shadow: 4px 4px 0px #000000;
+        }
+
+        .api-key-item {
+            display: flex;
+            align-items: center;
+            padding: 25px;
+            border-bottom: 4px solid #000000;
+            transition: all 0.2s ease;
+            position: relative;
+            background: #ffffff;
+        }
+
+        .api-key-item:hover {
+            background: #ffff00;
+            transform: translateX(4px);
+        }
+
+        .api-key-item:last-child {
+            border-bottom: none;
+        }
+
+        .api-key-info {
+            flex: 1;
+        }
+
+        .api-key-value {
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            color: #000000;
+            margin-bottom: 8px;
+            word-break: break-all;
+            background: #00ffff;
+            padding: 12px 16px;
+            border-radius: 0;
+            border: 3px solid #000000;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .api-key-meta {
+            color: #000000;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .api-key-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 0;
+            font-size: 12px;
+            font-weight: 900;
+            margin-right: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 3px solid #000000;
+        }
+
+        .status-active {
+            background: #00ff00;
+            color: #000000;
+        }
+
+        .status-deactivated {
+            background: #ff0000;
+            color: #ffffff;
+        }
+
+        .status-donated {
+            background: #0000ff;
+            color: #ffffff;
+        }
+
+        .server-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .server-card {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 0;
+            border: 4px solid #000000;
+            box-shadow: 4px 4px 0px #000000;
+            transition: all 0.2s ease;
+            color: #000000;
+        }
+
+        .server-card:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px #000000;
+        }
+
+        .server-card p {
+            color: #000000;
+            font-weight: 700;
+            margin: 8px 0;
+        }
+
+        .server-card strong {
+            color: #000000;
+            font-weight: 900;
+        }
+
+        .server-status {
+            display: flex;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .server-status strong {
+            color: #000000;
+            font-weight: 900;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .status-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 0;
+            margin-right: 12px;
+            border: 3px solid #000000;
+        }
+
+        .status-online {
+            background: #00ff00;
+            color: #00ff00;
+        }
+
+        .status-offline {
+            background: #ff0000;
+            color: #ff0000;
+        }
+
+        .alert {
+            padding: 20px 24px;
+            border-radius: 0;
+            margin-bottom: 25px;
+            font-size: 16px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 4px solid #000000;
+        }
+
+        .alert-success {
+            background: #00ff00;
+            color: #000000;
+        }
+
+        .alert-error {
+            background: #ff0000;
+            color: #ffffff;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 0;
+            text-align: center;
+            border: 4px solid #000000;
+            box-shadow: 4px 4px 0px #000000;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px #000000;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 900;
+            color: #000000;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 0px #ffff00;
+        }
+
+        .stat-label {
+            color: #000000;
+            font-size: 16px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #000000;
+            font-size: 18px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Login Styles */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #000000;
+        }
+
+        .login-box {
+            background: #ffffff;
+            padding: 50px;
+            border-radius: 0;
+            box-shadow: 8px 8px 0px #000000;
+            width: 100%;
+            max-width: 420px;
+            border: 4px solid #000000;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .login-header h1 {
+            color: #000000;
+            font-size: 3rem;
+            margin-bottom: 12px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 4px 4px 0px #ffff00;
+        }
+
+        .login-header p {
+            color: #000000;
+            font-size: 18px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .login-form input {
+            padding: 18px 20px;
+            border: 4px solid #000000;
+            border-radius: 0;
+            font-size: 16px;
+            font-weight: 900;
+            transition: all 0.2s ease;
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .login-form input::placeholder {
+            color: #666666;
+            font-weight: 700;
+        }
+
+        .login-form input:focus {
+            outline: none;
+            border-color: #ff00ff;
+            box-shadow: 4px 4px 0px #000000;
+            transform: translate(-2px, -2px);
+        }
+
+        .login-btn {
+            background: #ff00ff;
+            color: #ffffff;
+            padding: 20px;
+            border: 4px solid #000000;
+            border-radius: 0;
+            font-size: 18px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 4px 4px 0px #000000;
+        }
+
+        .login-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px #000000;
+        }
+
+        .login-error {
+            background: #ff0000;
+            color: #ffffff;
+            padding: 15px 20px;
+            border-radius: 0;
+            font-size: 16px;
+            font-weight: 900;
+            border: 4px solid #000000;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .dashboard-container {
+            display: none;
+        }
+
+        .dashboard-container.authenticated {
+            display: block;
+        }
+
+        .logout-btn {
+            background: #ff0000;
+            color: #ffffff;
+            padding: 12px 24px;
+            border: 3px solid #000000;
+            border-radius: 0;
+            font-size: 14px;
+            font-weight: 900;
+            cursor: pointer;
+            margin-left: 18px;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 3px 3px 0px #000000;
+        }
+
+        .logout-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0px #000000;
+        }
+
+        /* User Management Styles */
+        .user-list {
+            background: #ffffff;
+            border-radius: 0;
+            overflow: hidden;
+            border: 4px solid #000000;
+            box-shadow: 4px 4px 0px #000000;
+        }
+
+        .user-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 25px;
+            border-bottom: 4px solid #000000;
+            transition: all 0.2s ease;
+            background: #ffffff;
+        }
+
+        .user-item:hover {
+            background: #00ffff;
+            transform: translateX(4px);
+        }
+
+        .user-item:last-child {
+            border-bottom: none;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-username {
+            font-weight: 900;
+            color: #000000;
+            margin-bottom: 6px;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .user-meta {
+            font-size: 14px;
+            color: #000000;
+            font-weight: 700;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-sm {
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Server Usage Styles */
+        .server-usage-card {
+            background: #ffffff;
+            border-radius: 0;
+            padding: 25px;
+            border: 4px solid #000000;
+            margin-bottom: 20px;
+            transition: all 0.2s ease;
+            box-shadow: 4px 4px 0px #000000;
+            color: #000000;
+        }
+
+        .server-usage-card:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px #000000;
+        }
+
+        .server-usage-card p, .server-usage-card span, .server-usage-card div {
+            color: #000000;
+        }
+
+        .server-usage-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .server-port {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #000000;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .server-health {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .health-indicator {
+            width: 16px;
+            height: 16px;
+            border-radius: 0;
+            border: 3px solid #000000;
+        }
+
+        .health-excellent {
+            background: #00ff00;
+            color: #00ff00;
+        }
+
+        .health-good {
+            background: #ffff00;
+            color: #ffff00;
+        }
+
+        .health-poor {
+            background: #ff0000;
+            color: #ff0000;
+        }
+
+        .server-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 18px;
+            margin-bottom: 20px;
+        }
+
+        .metric-item {
+            text-align: center;
+            padding: 16px;
+            background: #ffffff;
+            border-radius: 0;
+            border: 3px solid #000000;
+            box-shadow: 2px 2px 0px #000000;
+        }
+
+        .metric-value {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: #000000;
+            text-shadow: 1px 1px 0px #ffff00;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: #000000;
+            margin-top: 6px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 16px;
+            background: #ffffff;
+            border-radius: 0;
+            overflow: hidden;
+            margin-top: 12px;
+            border: 3px solid #000000;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #00ff00;
+            transition: width 0.3s ease;
+            border-radius: 0;
+        }
+
+        .server-analytics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 35px;
+        }
+
+        @media (max-width: 768px) {
+            .server-analytics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-container {
+            position: relative;
+            height: 220px;
+            background: #ffffff;
+            border-radius: 0;
+            border: 4px solid #000000;
+            box-shadow: 4px 4px 0px #000000;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #000000;
+            font-style: normal;
+            padding: 50px;
+            font-size: 16px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Testing & Diagnostics Styles */
+        .btn-secondary {
+            background: #000000;
+            color: #ffffff;
+            box-shadow: 4px 4px 0px #000000;
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 6px 6px 0px #000000;
+        }
+
+        .btn-info {
+            background: #00ffff;
+            color: #000000;
+            box-shadow: 4px 4px 0px #000000;
+        }
+
+        .btn-info:hover {
+            box-shadow: 6px 6px 0px #000000;
+        }
+
+        #diagnosticsResults {
+            max-height: 520px;
+            overflow-y: auto;
+            border: 4px solid #000000;
+            border-radius: 0;
+            background: #ffffff;
+            box-shadow: 4px 4px 0px #000000;
+        }
+
+        .test-result-card {
+            margin: 12px;
+            padding: 16px;
+            border-radius: 0;
+            border-left: 6px solid;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .test-result-success {
+            background: #00ff00;
+            border-left-color: #000000;
+            color: #000000;
+            border: 3px solid #000000;
+        }
+
+        .test-result-error {
+            background: #ff0000;
+            border-left-color: #000000;
+            color: #ffffff;
+            border: 3px solid #000000;
+        }
+
+        .test-result-warning {
+            background: #ffff00;
+            border-left-color: #000000;
+            color: #000000;
+            border: 3px solid #000000;
+        }
+
+        .stats-overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .mini-stat-card {
+            background: #ffffff;
+            padding: 16px;
+            border-radius: 0;
+            text-align: center;
+            border: 3px solid #000000;
+            box-shadow: 2px 2px 0px #000000;
+            transition: all 0.2s ease;
+        }
+
+        .mini-stat-card:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0px #000000;
+        }
+
+        .mini-stat-value {
+            font-size: 1.6rem;
+            font-weight: 900;
+            margin-bottom: 6px;
+            color: #000000;
+            text-shadow: 1px 1px 0px #ffff00;
+        }
+
+        .mini-stat-label {
+            font-size: 14px;
+            color: #000000;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Responsive Design Improvements */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                border-radius: 15px;
+            }
+            
+            .nav-tabs {
+                flex-wrap: wrap;
+            }
+            
+            .nav-tab {
+                flex: auto;
+                min-width: 120px;
+                padding: 12px 15px;
+                font-size: 14px;
+            }
+            
+            .section {
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+                gap: 15px;
+            }
+            
+            .header {
+                padding: 25px 20px;
+            }
+            
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .btn {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+        }
+
+        /* Neo-brutalism scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #ffffff;
+            border: 2px solid #000000;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ff00ff;
+            border: 2px solid #000000;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00ffff;
+        }
+
+        /* Neo-brutalism animations */
+        .section, .stat-card, .server-card, .api-key-item, .user-item {
+            animation: slideInBrutal 0.4s ease-out;
+        }
+
+        @keyframes slideInBrutal {
+            from {
+                opacity: 0;
+                transform: translateX(-20px) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) translateY(0);
+            }
+        }
+
+        /* Enhanced form focus states */
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            transform: translate(-2px, -2px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginContainer" class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <h1>🚀 Kimaaka Admin</h1>
+                <p>Admin Dashboard Login</p>
+            </div>
+            <div id="loginError" class="login-error hidden"></div>
+            <form class="login-form" onsubmit="handleLogin(event)">
+                <input type="text" id="username" placeholder="Username" required>
+                <input type="password" id="password" placeholder="Password" required>
+                <button type="submit" class="login-btn">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Dashboard (Hidden until authenticated) -->
+    <div id="dashboardContainer" class="dashboard-container">
+        <div class="container">
+            <div class="header">
+                <h1>🚀 Kimaaka Admin Dashboard</h1>
+                <p>Manage API Keys & Monitor Servers
+                    <button class="logout-btn" onclick="logout()">Logout</button>
+                </p>
+            </div>
+
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="showTab('overview')">📊 Overview</button>
+                <button class="nav-tab" onclick="showTab('api-keys')">🔑 API Keys</button>
+                <button class="nav-tab" onclick="showTab('servers')">🖥️ Servers</button>
+                <button class="nav-tab" onclick="showTab('users')">👥 Users</button>
+                <button class="nav-tab" onclick="showTab('settings')">⚙️ Settings</button>
+            </div>
+
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalApiKeys">-</div>
+                    <div class="stat-label">Total API Keys</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="activeApiKeys">-</div>
+                    <div class="stat-label">Active Keys</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="donatedApiKeys">-</div>
+                    <div class="stat-label">Donated Keys</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="onlineServers">-</div>
+                    <div class="stat-label">Online Servers</div>
+                </div>
+            </div>
+
+            <!-- Usage Statistics Section -->
+            <div class="section">
+                <h3>📊 Server Usage Statistics</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalApiCalls">-</div>
+                        <div class="stat-label">Total API Calls</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalAllocations">-</div>
+                        <div class="stat-label">Total Allocations</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="successRate">-</div>
+                        <div class="stat-label">Success Rate</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="avgResponseTime">-</div>
+                        <div class="stat-label">Avg Response Time</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="lastUsed">-</div>
+                        <div class="stat-label">Last API Call</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="serverUptime">-</div>
+                        <div class="stat-label">Server Uptime</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Usage Chart Section -->
+            <div class="section">
+                <h3>📈 API Usage Trend</h3>
+                <div style="margin-bottom: 20px;">
+                    <label for="timeRange" style="display: inline-block; margin-right: 15px; font-weight: 900; color: #000000; text-transform: uppercase; letter-spacing: 1px;">Time Range:</label>
+                    <select id="timeRange" style="padding: 8px 12px; border: 3px solid #000000; font-weight: 700; background: #ffffff; color: #000000; font-size: 14px;">
+                        <option value="7">Last 7 Days</option>
+                        <option value="14">Last 14 Days</option>
+                        <option value="30" selected>Last 30 Days</option>
+                        <option value="60">Last 60 Days</option>
+                        <option value="90">Last 90 Days</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="updateUsageChart()" style="margin-left: 15px;">Update Chart</button>
+                </div>
+                <div id="usageChart">
+                    <div class="loading">Loading usage chart...</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>📈 Recent Activity</h3>
+                <div id="recentActivity">
+                    <div class="loading">Loading recent activity...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- API Keys Tab -->
+        <div id="api-keys" class="tab-content">
+            <div class="section">
+                <h3>➕ Add New API Key</h3>
+                <div class="form-group">
+                    <label for="newApiKey">Gemini API Key:</label>
+                    <input type="text" id="newApiKey" placeholder="Enter Gemini API key...">
+                </div>
+                <div class="form-group">
+                    <label for="keyDescription">Description (Optional):</label>
+                    <input type="text" id="keyDescription" placeholder="e.g., Main production key">
+                </div>
+                <button class="btn btn-primary" onclick="addApiKey()">Add API Key</button>
+                <button class="btn btn-warning" onclick="validateAllKeys()">Validate All Keys</button>
+            </div>
+
+            <div class="section">
+                <h3>🗂️ API Keys Management</h3>
+                <div id="apiKeysList">
+                    <div class="loading">Loading API keys...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Tab -->
+        <div id="users" class="tab-content">
+            <div class="section">
+                <h3>➕ Add New User</h3>
+                <div class="form-group">
+                    <label for="newUsername">Username:</label>
+                    <input type="text" id="newUsername" placeholder="Enter username...">
+                </div>
+                <div class="form-group">
+                    <label for="newUserPassword">Password:</label>
+                    <input type="password" id="newUserPassword" placeholder="Enter password...">
+                </div>
+                <div class="form-group">
+                    <label for="userRole">Role:</label>
+                    <select id="userRole" style="width: 100%; padding: 12px 15px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
+                        <option value="admin">Admin</option>
+                        <option value="viewer">Viewer</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="addUser()">Add User</button>
+            </div>
+
+            <div class="section">
+                <h3>👥 User Management</h3>
+                <div id="usersList">
+                    <div class="loading">Loading users...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Servers Tab -->
+        <div id="servers" class="tab-content">
+            <div class="section">
+                <h3>🖥️ Server Status & Testing</h3>
+                <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn btn-primary" onclick="checkAllServers()">🔄 Check All Servers</button>
+                    <button class="btn btn-secondary" onclick="testServerHealth()">❤️ Health Test</button>
+                    <button class="btn btn-warning" onclick="testAdminEndpoints()">🔐 Security Test</button>
+                    <button class="btn btn-info" onclick="testAggregatedStats()">📊 Stats Test</button>
+                </div>
+                <div class="server-grid" id="serversList">
+                    <div class="loading">Checking server status...</div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3>🔍 Server Diagnostics</h3>
+                <div id="diagnosticsResults" style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-top: 10px;">
+                    <p style="color: #666; margin: 0;">Click any test button above to run diagnostics...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div id="settings" class="tab-content">
+            <div class="section">
+                <h3>⚙️ System Settings</h3>
+                <div class="form-group">
+                    <label for="keyRotationInterval">API Key Validation Interval (hours):</label>
+                    <input type="number" id="keyRotationInterval" value="2" min="1" max="24">
+                </div>
+                <div class="form-group">
+                    <label for="serverTimeout">Server Timeout (seconds):</label>
+                    <input type="number" id="serverTimeout" value="10" min="5" max="60">
+                </div>
+                <button class="btn btn-success" onclick="saveSettings()">Save Settings</button>
+            </div>
+
+            <div class="section">
+                <h3>🗂️ System Actions</h3>
+                <button class="btn btn-warning" onclick="resetAllocationCounts()">Reset Allocation Counts</button>
+                <button class="btn btn-danger" onclick="clearInactiveKeys()">Remove Deactivated Keys</button>
+                <button class="btn btn-primary" onclick="exportData()">Export Data</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="admin.js?v=3"></script>
+</body>
+</html>
