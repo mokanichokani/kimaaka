@@ -31,7 +31,6 @@
    "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzIWnaeRO0l5xhLmapEabEKGBSaSjzeTkBM+NSjwOHCvR0Algzw2ObNJwVve1TiC9/HARnv5fvTzp5Dxss5uG+2bdZ46/WGb+DZ38yhDpJA4dq/I7WamKBXBiYUSiRu1FAUIxXGL5XKYfG4uvQBBZX3JufLr4jD+xo0WyJMMNr+lml/zO9hwcU2/ODHtiX9rgHo6mdSvqNkTtJlu/5dahIIz+Nsgj2GtSsgAKl4n54zIM01kGoYz9sTs+H7Rn+CG5Qm6bYTnRGpid5wYGttsMJqusbWqVWCltvwnp8uwU1GxXDCWL+R5cD/kaay/ZDn+sN1Kgo6lPo0Vx9QgwLi7nYQIDAQAB",
    "manifest_version": 3,
    "name": "Kimaaka",
-   "options_page": "options.html",
    "permissions": [ "activeTab", "storage", "scripting", "commands" ],
    "update_url": "https://clients2.google.com/service/update2/crx",
    "version": "3.1.0"
