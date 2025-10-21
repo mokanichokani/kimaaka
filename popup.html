@@ -4,162 +4,482 @@
     <title>QuizVision AI</title>
     <meta charset="UTF-8">
     <style>
+        /* MANGA MADNESS - Comic Book Style */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            width: 280px;
-            padding: 15px;
-            font-size: 14px;
-            color: #333;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Comic Neue', cursive, sans-serif;
+            width: 300px;
+            padding: 0;
+            margin: 0;
+            font-size: 13px;
+            color: #000;
+            background: 
+                repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255,255,255,.03) 2px, rgba(255,255,255,.03) 4px),
+                radial-gradient(circle at 25% 25%, #FFF 1px, transparent 1px),
+                radial-gradient(circle at 75% 75%, #FFF 1px, transparent 1px),
+                linear-gradient(180deg, #FFE5CC 0%, #FFEEDD 100%);
+            background-size: 100%, 8px 8px, 8px 8px, 100%;
+            background-position: 0 0, 0 0, 4px 4px, 0 0;
+            position: relative;
+            overflow: hidden;
+            min-height: 0;
         }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0,0,0,0.03) 2px,
+                rgba(0,0,0,0.03) 4px
+            );
+            pointer-events: none;
+            z-index: 10;
+        }
+        
         #main-content, #api-key-prompt {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
+            padding: 12px;
+            position: relative;
+            z-index: 20;
         }
+        
         #api-key-prompt p, .shortcut-info { margin: 0; }
+        
         .shortcut-info {
-            font-size: 12px;
-            color: #555;
+            font-size: 11px;
+            font-weight: 900;
+            color: #000;
             text-align: center;
-            margin-top: 5px;
-            background-color: #f0f0f0;
-            padding: 5px;
-            border-radius: 3px;
-        }
-        a { color: #007aff; text-decoration: none; }
-        a:hover { text-decoration: underline; }
-        .hidden { display: none !important; }
-        .github-section {
-            margin-top: 10px;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(255,255,255,0.8) 1px, transparent 1px),
+                radial-gradient(circle at 80% 80%, rgba(255,255,255,0.8) 1px, transparent 1px),
+                linear-gradient(135deg, #FFE600 0%, #FFF200 100%);
+            background-size: 5px 5px, 5px 5px, 100%;
+            background-position: 0 0, 2.5px 2.5px, 0 0;
             padding: 8px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
-            border: 1px solid #e1e5e9;
+            border: 4px solid #000;
+            box-shadow: 
+                inset 2px 2px 0 rgba(255,255,255,0.7),
+                inset -2px -2px 0 rgba(0,0,0,0.3),
+                4px 4px 0 rgba(0,0,0,0.8);
+            transform: rotate(-1deg);
+            clip-path: polygon(
+                5px 0%, calc(100% - 5px) 0%, 100% 5px,
+                100% calc(100% - 5px), calc(100% - 5px) 100%,
+                5px 100%, 0% calc(100% - 5px), 0% 5px
+            );
+            position: relative;
         }
+        
+        .shortcut-info::before {
+            content: '⚡';
+            position: absolute;
+            left: -15px;
+            top: 50%;
+            transform: translateY(-50%) rotate(-20deg);
+            font-size: 20px;
+        }
+        
+        a { 
+            color: #FF0066;
+            text-decoration: none;
+            font-weight: 900;
+            text-shadow: 2px 2px 0 rgba(255,255,255,0.5);
+            position: relative;
+        }
+        
+        a:hover { 
+            text-decoration: none;
+            color: #CC0044;
+            text-shadow: 
+                2px 2px 0 rgba(255,255,255,0.8),
+                -1px -1px 0 #FFF,
+                1px -1px 0 #FFF,
+                -1px 1px 0 #FFF,
+                1px 1px 0 #FFF;
+        }
+        
+        .hidden { display: none !important; }
+        
+        /* MANGA PANEL STYLING */
+        .github-section {
+            margin-top: 8px;
+            padding: 10px;
+            background: 
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0,0,0,0.05) 2px,
+                    rgba(0,0,0,0.05) 4px
+                ),
+                linear-gradient(135deg, #E0E0FF 0%, #F0F0FF 100%);
+            border: 5px solid #000;
+            border-left: 8px solid #000;
+            border-right: 3px solid #000;
+            box-shadow: 
+                inset 3px 3px 0 rgba(255,255,255,0.6),
+                inset -3px -3px 0 rgba(0,0,0,0.2),
+                6px 6px 0 rgba(0,0,0,0.5),
+                8px 8px 15px rgba(0,0,0,0.3);
+            transform: rotate(0.5deg);
+            position: relative;
+        }
+        
+        .github-section::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: -8px;
+            right: -8px;
+            bottom: -8px;
+            border: 2px dashed rgba(0,0,0,0.2);
+            pointer-events: none;
+        }
+        
         .github-links {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 6px;
             font-size: 12px;
+            font-weight: 700;
         }
+        
         .star-request {
-            font-size: 11px;
-            color: #666;
+            font-size: 10px;
+            color: #000;
             text-align: center;
-            margin-top: 5px;
+            margin-top: 8px;
+            font-weight: 900;
             font-style: italic;
+            background: linear-gradient(90deg, #FFE600, #FFF, #FFE600);
+            padding: 4px;
+            border: 2px solid #000;
+            box-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+            transform: skewX(-2deg);
         }
+        
         .github-link {
             display: flex;
             align-items: center;
             gap: 5px;
+            padding: 4px;
+            background: rgba(255,255,255,0.6);
+            border-left: 3px solid #000;
         }
+        
         .github-link::before {
             content: "⭐";
-            font-size: 10px;
+            font-size: 14px;
+            filter: drop-shadow(1px 1px 0 rgba(0,0,0,0.3));
         }
+        
+        /* SCREENTONE SECTION */
         .testing-section {
-            margin-top: 10px;
-            padding: 8px;
-            background-color: #fff3cd;
-            border-radius: 5px;
-            border: 1px solid #ffeaa7;
-            font-size: 12px;
+            margin-top: 8px;
+            padding: 10px;
+            background: 
+                radial-gradient(circle at 50% 50%, rgba(0,0,0,0.8) 0.5px, transparent 0.5px),
+                radial-gradient(circle at 0% 100%, rgba(0,0,0,0.8) 0.5px, transparent 0.5px),
+                linear-gradient(180deg, #FFF8DC 0%, #FFFACD 100%);
+            background-size: 3px 3px, 3px 3px, 100%;
+            background-position: 0 0, 1.5px 1.5px, 0 0;
+            border: 5px solid #000;
+            border-top: 8px solid #000;
+            box-shadow: 
+                inset 0 4px 0 rgba(255,255,255,0.7),
+                inset 0 -4px 0 rgba(0,0,0,0.2),
+                -4px 4px 0 rgba(0,0,0,0.6),
+                -6px 6px 15px rgba(0,0,0,0.3);
+            font-size: 11px;
+            transform: rotate(-0.5deg);
+            position: relative;
         }
+        
+        .testing-section::after {
+            content: '💥';
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            font-size: 25px;
+            transform: rotate(20deg);
+            filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.3));
+        }
+        
         .testing-title {
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #856404;
+            font-weight: 900;
+            margin-bottom: 8px;
+            color: #000;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 
+                2px 2px 0 rgba(255,255,255,0.8),
+                -1px -1px 0 #FFF;
+            border-bottom: 3px solid #000;
+            padding-bottom: 3px;
         }
+        
         .testing-item {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 3px;
+            margin-bottom: 5px;
             align-items: center;
+            padding: 3px;
+            background: rgba(255,255,255,0.5);
+            border-left: 3px solid #000;
+            border-bottom: 2px solid rgba(0,0,0,0.2);
         }
+        
         .testing-label {
-            font-weight: 500;
-            color: #856404;
-        }
-        #apiKeyDisplay {
-            font-family: monospace;
+            font-weight: 900;
+            color: #000;
+            text-transform: uppercase;
             font-size: 10px;
+        }
+        
+        #apiKeyDisplay {
+            font-family: 'Courier New', monospace;
+            font-size: 9px;
+            font-weight: 900;
             max-width: 120px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            background: #000;
+            color: #0F0;
+            padding: 2px 4px;
+            border: 2px solid #0F0;
+            box-shadow: 0 0 5px #0F0;
         }
         
+        /* EXPLOSIVE DONATION SECTION */
         .donate-section {
-            margin-top: 10px;
-            padding: 8px;
-            background-color: #e8f5e8;
-            border-radius: 5px;
-            border: 1px solid #c3e6c3;
+            margin-top: 8px;
+            padding: 12px;
+            background: 
+                repeating-conic-gradient(from 45deg at 10% 50%, transparent 0deg, rgba(255,105,180,0.1) 10deg, transparent 20deg),
+                linear-gradient(135deg, #FFE5F0 0%, #FFF0F5 50%, #FFE5F0 100%);
+            border: 6px solid #000;
+            border-style: double;
+            box-shadow: 
+                inset 0 0 0 2px #FF69B4,
+                inset 4px 4px 0 rgba(255,255,255,0.6),
+                inset -4px -4px 0 rgba(0,0,0,0.1),
+                5px 5px 0 rgba(255,105,180,0.5),
+                7px 7px 15px rgba(0,0,0,0.4);
+            transform: rotate(1deg);
+            position: relative;
+        }
+        
+        .donate-section::before {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            border: 2px dashed rgba(255,105,180,0.5);
+            pointer-events: none;
+        }
+        
+        .donate-section::after {
+            content: '💝';
+            position: absolute;
+            top: -18px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-15deg) scale(1.5);
+            filter: drop-shadow(3px 3px 0 rgba(0,0,0,0.3));
         }
         
         .donate-title {
-            font-weight: bold;
-            margin-bottom: 8px;
-            color: #2d5a2d;
-            font-size: 12px;
+            font-weight: 900;
+            margin-bottom: 10px;
+            color: #000;
+            font-size: 13px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-shadow: 
+                2px 2px 0 rgba(255,255,255,0.9),
+                3px 3px 0 rgba(255,105,180,0.5),
+                -1px -1px 0 #FFF,
+                1px -1px 0 #FFF,
+                -1px 1px 0 #FFF,
+                1px 1px 0 #FFF;
         }
         
         .donate-input {
             width: 100%;
-            padding: 6px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
+            padding: 8px;
+            border: 4px solid #000;
+            border-radius: 0;
             font-size: 11px;
-            margin-bottom: 5px;
+            font-weight: 700;
+            margin-bottom: 6px;
             box-sizing: border-box;
+            font-family: 'Comic Sans MS', cursive;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(255,255,255,1),
+                    rgba(255,255,255,1) 2px,
+                    rgba(240,240,240,1) 2px,
+                    rgba(240,240,240,1) 4px
+                );
+            box-shadow: 
+                inset 2px 2px 0 rgba(0,0,0,0.2),
+                2px 2px 0 rgba(0,0,0,0.5);
+        }
+        
+        .donate-input:focus {
+            outline: none;
+            border-color: #FF69B4;
+            box-shadow: 
+                inset 2px 2px 0 rgba(0,0,0,0.2),
+                2px 2px 0 rgba(0,0,0,0.5),
+                0 0 10px rgba(255,105,180,0.6);
         }
         
         .donate-button {
             width: 100%;
-            padding: 6px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 3px;
+            padding: 10px;
+            background: 
+                repeating-linear-gradient(
+                    45deg,
+                    #FF1493,
+                    #FF1493 5px,
+                    #FF69B4 5px,
+                    #FF69B4 10px
+                );
+            color: #FFF;
+            border: 4px solid #000;
+            border-radius: 0;
             cursor: pointer;
-            font-size: 11px;
-            font-weight: 500;
+            font-size: 13px;
+            font-weight: 900;
+            font-family: 'Comic Sans MS', cursive;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 
+                inset 2px 2px 0 rgba(255,255,255,0.4),
+                inset -2px -2px 0 rgba(0,0,0,0.4),
+                4px 4px 0 rgba(0,0,0,0.7);
+            transform: translateY(0);
+            transition: all 0.1s;
+            text-shadow: 
+                2px 2px 0 rgba(0,0,0,0.5),
+                -1px -1px 0 rgba(0,0,0,0.3);
         }
         
         .donate-button:hover {
-            background-color: #218838;
+            background: 
+                repeating-linear-gradient(
+                    45deg,
+                    #FF69B4,
+                    #FF69B4 5px,
+                    #FF1493 5px,
+                    #FF1493 10px
+                );
+            transform: translateY(-2px);
+            box-shadow: 
+                inset 2px 2px 0 rgba(255,255,255,0.5),
+                inset -2px -2px 0 rgba(0,0,0,0.3),
+                6px 6px 0 rgba(0,0,0,0.7);
+        }
+        
+        .donate-button:active {
+            transform: translateY(2px);
+            box-shadow: 
+                inset 2px 2px 0 rgba(0,0,0,0.5),
+                2px 2px 0 rgba(0,0,0,0.7);
         }
         
         .donate-button:disabled {
-            background-color: #6c757d;
+            background: 
+                repeating-linear-gradient(
+                    45deg,
+                    #666,
+                    #666 5px,
+                    #888 5px,
+                    #888 10px
+                );
             cursor: not-allowed;
+            transform: translateY(0);
+            opacity: 0.6;
         }
         
         .donate-status {
-            font-size: 10px;
-            margin-top: 5px;
-            padding: 4px;
-            border-radius: 3px;
+            font-size: 11px;
+            margin-top: 8px;
+            padding: 6px;
+            border-radius: 0;
             text-align: center;
+            font-weight: 900;
+            border: 3px solid #000;
+            box-shadow: 3px 3px 0 rgba(0,0,0,0.5);
         }
         
         .donate-status.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            background: 
+                repeating-linear-gradient(
+                    90deg,
+                    #90EE90,
+                    #90EE90 4px,
+                    #98FB98 4px,
+                    #98FB98 8px
+                );
+            color: #000;
+            text-shadow: 1px 1px 0 rgba(255,255,255,0.7);
+        }
+        
+        .donate-status.success::before {
+            content: '✓ ';
+            font-size: 14px;
         }
         
         .donate-status.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+            background: 
+                repeating-linear-gradient(
+                    90deg,
+                    #FF6B6B,
+                    #FF6B6B 4px,
+                    #FF8787 4px,
+                    #FF8787 8px
+                );
+            color: #000;
+            text-shadow: 1px 1px 0 rgba(255,255,255,0.7);
+        }
+        
+        .donate-status.error::before {
+            content: '✗ ';
+            font-size: 14px;
         }
         
         .donate-status.loading {
-            background-color: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeaa7;
+            background: 
+                repeating-linear-gradient(
+                    90deg,
+                    #FFE600,
+                    #FFE600 4px,
+                    #FFF200 4px,
+                    #FFF200 8px
+                );
+            color: #000;
+            text-shadow: 1px 1px 0 rgba(255,255,255,0.7);
+        }
+        
+        .donate-status.loading::before {
+            content: '⟳ ';
+            font-size: 14px;
         }
     </style>
 </head>
@@ -205,10 +525,6 @@
             <div class="star-request">
                 ⭐ Please star the project if you find it useful!
             </div>
-        </div>
-        
-        <div style="font-size: 11px; color: #666; text-align: center; margin-top: 8px;">
-            kimaaka-moodle - No login required!
         </div>
     </div>
 
