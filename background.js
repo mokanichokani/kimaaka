@@ -219,11 +219,7 @@ chrome.commands.onCommand.addListener((command, tab) => {
 
 // Listen for the message from the popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === "triggerAnalysisFromPopup") {
-        handleTriggerAnalysis(sender.tab);
-        sendResponse({ status: "processing_triggered" });
-        return true; 
-    } else if (request.action === "getServerUrl") {
+    if (request.action === "getServerUrl") {
         // Provide the server URL for donations
         sendResponse({ 
             serverUrl: SERVER_API_URL,

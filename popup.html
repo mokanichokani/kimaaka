@@ -16,31 +16,6 @@
             flex-direction: column;
             gap: 10px;
         }
-        #output-container {
-            background-color: #f7f7f7;
-            border: 1px solid #e0e0e0;
-            border-radius: 4px;
-            padding: 10px;
-            min-height: 60px;
-            max-height: 150px;
-            overflow-y: auto;
-            font-size: 13px;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-        #loading { font-style: italic; color: #666; }
-        button#triggerAnalysisButton {
-            padding: 10px 15px;
-            background-color: #007aff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: background-color 0.2s ease;
-        }
-        button#triggerAnalysisButton:hover { background-color: #0056b3; }
         #api-key-prompt p, .shortcut-info { margin: 0; }
         .shortcut-info {
             font-size: 12px;
@@ -190,11 +165,6 @@
 </head>
 <body>
     <div id="main-content">
-        <button id="triggerAnalysisButton">Analyze Current Tab</button>
-        <div id="output-container">
-            <div id="loading" class="hidden">Analyzing...</div>
-            <div id="result">Ready to analyze! Click button or use shortcut.</div>
-        </div>
         <div class="shortcut-info">Shortcut: <span id="shortcutDisplay">Loading...</span></div>
         
         <!-- Testing section for API key and timer -->

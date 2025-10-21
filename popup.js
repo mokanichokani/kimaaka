@@ -1,9 +1,6 @@
 // popup.js
 document.addEventListener('DOMContentLoaded', () => {
-    const resultDiv = document.getElementById('result');
-    const loadingDiv = document.getElementById('loading');
     const mainContentDiv = document.getElementById('main-content');
-    const triggerAnalysisButton = document.getElementById('triggerAnalysisButton');
     const shortcutDisplay = document.getElementById('shortcutDisplay');
     const apiKeyDisplay = document.getElementById('apiKeyDisplay');
     const cacheStatusDisplay = document.getElementById('cacheStatusDisplay');
@@ -15,14 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const donateButton = document.getElementById('donateButton');
     const donateStatus = document.getElementById('donateStatus');
 
-    function updatePopupUI(isLoading, text, rror = false) {
-        loadingDiv.classList.toggle('hidden', !isLoading);
-        resultDiv.classList.toggle('hidden', isLoading);
-        if (text) {
-            resultDiv.textContent = text;
-        }
-        resultDiv.style.color = rror ? 'red' : 'inherit';
-    }
 
     function showDonationStatus(message, type = 'loading') {
         donateStatus.classList.remove('hidden', 'success', 'error', 'loading');
@@ -156,29 +145,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Show main content immediately since no login is required
     mainContentDiv.classList.remove('hidden');
-    updatePopupUI(false, 'Ready to analyze! Click button or use shortcut.');
     
     // Update testing info on load and every 30 seconds
     updateTestingInfo();
     setInterval(updateTestingInfo, 30000);
 
-    // Event listeners
-    if (triggerAnalysisButton) {
-        triggerAnalysisButton.addEventListener('click', () => {
-            updatePopupUI(true, '');
-            chrome.runtime.sendMessage({ action: "triggerAnalysisFromPopup" }, (response) => {
-                if (chrome.runtime.lastError) {
-                    console.error("Error sending trigger message:", chrome.runtime.lastError.message);
-                    updatePopupUI(false, "Error starting analysis: " + chrome.runtime.lastError.message, true);
-                } else {
-                    // Background will send 'analysis_started_for_popup' or 'analysis_complete_for_popup'
-                    console.log("Analysis trigger sent to background.");
-                }
-            });
-            // Update testing info after triggering analysis
-            setTimeout(updateTestingInfo, 1000);
-        });
-    }
 
     // Donation button event listener
     if (donateButton) {
@@ -211,17 +182,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-        if (request.action === "analysis_started_for_popup") {
-            updatePopupUI(true, '');
-        } else if (request.action === "analysis_complete_for_popup") {
-            if (request.error) {
-                updatePopupUI(false, `Error: ${request.error}`, true);
-            } else {
-                updatePopupUI(false, request.result || "No result text.");
-            }
-        }
-    });
 
     if (shortcutDisplay) {
         chrome.commands.getAll((commands) => {
